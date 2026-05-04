@@ -1,8 +1,4 @@
-export type ActivityType =
-  | "electricity"
-  | "plastic1"
-  | "plastic2"
-  | "transport";
+export type ActivityType = "electricity" | "plastic1" | "plastic2" | "transport";
 export type Scope = "scope2" | "scope3";
 
 export interface Company {
