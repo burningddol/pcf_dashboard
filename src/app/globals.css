@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "../../.claude/skills/pcfboard/tokens.css";
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+}

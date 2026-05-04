@@ -1,0 +1,225 @@
+/* ─────────────────────────────────────────────────────────────
+   PCFBoard — Design Tokens
+   Light-first, dense analytics tone (Stripe/Mixpanel inspired).
+   Sustainability is signaled via Scope chart palette only.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Surfaces — slightly cool neutrals, < 0.02 chroma */
+  --bg: #ffffff;
+  --bg-1: #fafbfc;
+  --bg-2: #f4f6f8;
+  --bg-3: #eef1f4;
+  --bg-inset: #f7f9fa;
+
+  /* Borders / dividers — graduated from hairline to strong */
+  --line: #e6e9ed;
+  --line-2: #d9dee3;
+  --line-strong: #c2c8cf;
+  --line-soft: #eef0f3;
+
+  /* Text */
+  --fg: #0d1116;
+  --fg-1: #1f2630;
+  --fg-2: #4a5560;
+  --fg-3: #6b7682;
+  --fg-4: #94a0ad;
+  --fg-on-dark: #f5f7f9;
+
+  /* Brand accent — quiet teal, used sparingly for primary action only */
+  --accent: #0f4c5c;
+  --accent-hover: #0c3e4b;
+  --accent-soft: #e7f1f3;
+  --accent-fg: #ffffff;
+
+  /* Scope palette (deep teal → teal → lime) */
+  --scope-1: #0f4c5c;
+  --scope-1-soft: #d6e4e8;
+  --scope-2: #2a9d8f;
+  --scope-2-soft: #d8eeeb;
+  --scope-3: #a7c957;
+  --scope-3-soft: #ecf2d6;
+
+  /* Lifecycle palette (sequential, monochromatic-ish) */
+  --lc-raw: #0f4c5c;
+  --lc-mfg: #2a9d8f;
+  --lc-dist: #4a90a4;
+  --lc-use: #8aaab1;
+  --lc-eol: #c2cfb6;
+
+  /* Status */
+  --pos: #0a7c4a;     /* good — emissions down */
+  --pos-soft: #e3f3eb;
+  --neg: #b42318;     /* bad — emissions up */
+  --neg-soft: #fdeceb;
+  --warn: #b25e09;
+  --warn-soft: #fbf0e0;
+  --info: #1e5fb4;
+  --info-soft: #e6eef9;
+
+  /* Type scale */
+  --font-sans: "Pretendard", "IBM Plex Sans KR", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-num:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --t-display: 28px;
+  --t-h1: 22px;
+  --t-h2: 17px;
+  --t-h3: 14px;
+  --t-body: 13px;
+  --t-sm: 12px;
+  --t-xs: 11px;
+  --t-mono: 12px;
+
+  /* Spacing */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 40px;
+  --s-9: 56px;
+
+  /* Radius */
+  --r-1: 4px;
+  --r-2: 6px;
+  --r-3: 8px;
+  --r-4: 10px;
+  --r-5: 14px;
+
+  /* Shadows */
+  --sh-1: 0 1px 0 rgba(15,30,45,0.04);
+  --sh-2: 0 1px 2px rgba(15,30,45,0.06), 0 1px 0 rgba(15,30,45,0.04);
+  --sh-3: 0 4px 12px rgba(15,30,45,0.08), 0 1px 2px rgba(15,30,45,0.06);
+  --sh-pop: 0 12px 32px rgba(15,30,45,0.12), 0 2px 6px rgba(15,30,45,0.08);
+  --focus-ring: 0 0 0 3px rgba(15,76,92,0.15);
+}
+
+/* Dark mode (opt-in via [data-theme=dark] on a wrapper) */
+[data-theme="dark"] {
+  --bg: #0c1014;
+  --bg-1: #11161c;
+  --bg-2: #161c23;
+  --bg-3: #1d242c;
+  --bg-inset: #0e1318;
+
+  --line: #232a32;
+  --line-2: #2c343d;
+  --line-strong: #3a444f;
+  --line-soft: #1a2026;
+
+  --fg: #eef2f6;
+  --fg-1: #d8dee5;
+  --fg-2: #a9b3bd;
+  --fg-3: #818c97;
+  --fg-4: #5e6770;
+
+  --accent: #2a9d8f;
+  --accent-hover: #34b3a3;
+  --accent-soft: #15302d;
+
+  --scope-1-soft: #14272c;
+  --scope-2-soft: #15302d;
+  --scope-3-soft: #2a3318;
+
+  --pos-soft: #122a1f;
+  --neg-soft: #2c1614;
+  --warn-soft: #2a1f0d;
+  --info-soft: #11203a;
+
+  --sh-1: 0 1px 0 rgba(0,0,0,0.4);
+  --sh-2: 0 1px 2px rgba(0,0,0,0.5);
+  --sh-3: 0 4px 12px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.4);
+  --sh-pop: 0 12px 32px rgba(0,0,0,0.55);
+}
+
+/* ── Base typography on the app shell only ── */
+.pcf {
+  font-family: var(--font-sans);
+  color: var(--fg);
+  background: var(--bg);
+  font-size: var(--t-body);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "ss01", "cv11", "tnum";
+}
+.pcf, .pcf * { box-sizing: border-box; }
+.pcf .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.pcf .mono { font-family: var(--font-mono); }
+
+/* ── Atoms used everywhere ── */
+.pcf .row { display: flex; align-items: center; gap: var(--s-2); }
+.pcf .col { display: flex; flex-direction: column; }
+.pcf .between { display: flex; align-items: center; justify-content: space-between; }
+.pcf .muted { color: var(--fg-3); }
+.pcf .micro { font-size: var(--t-xs); color: var(--fg-3); letter-spacing: 0.04em; text-transform: uppercase; font-weight: 500; }
+.pcf .kbd { font-family: var(--font-mono); font-size: 11px; padding: 1px 5px; border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; color: var(--fg-2); background: var(--bg-1); }
+
+/* Pills */
+.pcf .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 999px; font-size: var(--t-xs); font-weight: 500; border: 1px solid transparent; }
+.pcf .pill .dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+.pcf .pill.s1 { color: var(--scope-1); background: var(--scope-1-soft); }
+.pcf .pill.s2 { color: var(--scope-2); background: var(--scope-2-soft); }
+.pcf .pill.s3 { color: #5d7a14; background: var(--scope-3-soft); }
+.pcf .pill.pos { color: var(--pos); background: var(--pos-soft); }
+.pcf .pill.neg { color: var(--neg); background: var(--neg-soft); }
+.pcf .pill.warn { color: var(--warn); background: var(--warn-soft); }
+.pcf .pill.info { color: var(--info); background: var(--info-soft); }
+.pcf .pill.ghost { color: var(--fg-2); background: var(--bg-2); border-color: var(--line); }
+
+/* Buttons */
+.pcf .btn { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: var(--r-2); border: 1px solid var(--line-2); background: var(--bg); color: var(--fg-1); font: inherit; font-size: var(--t-sm); font-weight: 500; cursor: pointer; transition: background .12s, border-color .12s, box-shadow .12s; }
+.pcf .btn:hover { background: var(--bg-1); border-color: var(--line-strong); }
+.pcf .btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.pcf .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.pcf .btn.primary:hover { background: var(--accent-hover); }
+.pcf .btn.ghost { border-color: transparent; background: transparent; color: var(--fg-2); }
+.pcf .btn.ghost:hover { background: var(--bg-2); color: var(--fg); }
+.pcf .btn.sm { height: 26px; padding: 0 9px; font-size: var(--t-xs); }
+.pcf .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Inputs */
+.pcf .input { height: 30px; padding: 0 10px; border-radius: var(--r-2); border: 1px solid var(--line-2); background: var(--bg); color: var(--fg); font: inherit; font-size: var(--t-sm); transition: border-color .12s, box-shadow .12s; }
+.pcf .input:hover { border-color: var(--line-strong); }
+.pcf .input:focus { outline: none; border-color: var(--accent); box-shadow: var(--focus-ring); }
+.pcf .input.invalid { border-color: var(--neg); box-shadow: 0 0 0 3px var(--neg-soft); }
+
+/* Cards / surfaces */
+.pcf .card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-3); }
+.pcf .card .card-h { padding: 14px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+.pcf .card .card-b { padding: 16px; }
+
+/* Table — dense Stripe-like */
+.pcf .tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--t-sm); }
+.pcf .tbl th { font-weight: 500; color: var(--fg-3); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--bg-1); font-size: var(--t-xs); letter-spacing: 0.02em; text-transform: uppercase; }
+.pcf .tbl td { padding: 10px 12px; border-bottom: 1px solid var(--line-soft); color: var(--fg-1); vertical-align: middle; }
+.pcf .tbl tbody tr { cursor: pointer; }
+.pcf .tbl tbody tr:hover td { background: var(--bg-1); }
+.pcf .tbl tbody tr.active td { background: var(--accent-soft); }
+.pcf .tbl td.num, .pcf .tbl th.num { text-align: right; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+
+/* Skeleton */
+@keyframes pcf-shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+.pcf .skel { background: linear-gradient(90deg, var(--bg-2) 0%, var(--bg-3) 50%, var(--bg-2) 100%); background-size: 400px 100%; animation: pcf-shimmer 1.4s infinite linear; border-radius: var(--r-1); display: inline-block; }
+
+/* Sparkline strip */
+.pcf .spark { display: block; width: 100%; height: 36px; }
+
+/* Section wrappers in canvas */
+.pcf-frame {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--sh-2);
+}
+
+/* Fonts via Google */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap');

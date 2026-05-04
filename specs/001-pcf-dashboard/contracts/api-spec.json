@@ -1,0 +1,425 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "HanaLoop PCF Dashboard — Fake Backend API",
+    "version": "1.0.0",
+    "description": "Next.js 16 App Router Route Handler로 구현하는 가짜 백엔드 API. 메모리 store(globalThis.__store) 위에서 동작하며, 모든 응답에 200~800ms 가변 latency, 쓰기는 10~20% 시뮬레이션 실패율을 가진다. 클라이언트는 src/lib/api/client.ts fetch wrapper만 사용한다 (헌법 VII. HTTP Boundary)."
+  },
+  "servers": [
+    { "url": "/api", "description": "Same-origin route handlers" }
+  ],
+  "tags": [
+    { "name": "companies", "description": "회사 목록 (시드 고정, CRUD 비대상)" },
+    { "name": "activities", "description": "활동 데이터 — 본 기능의 핵심 자원" },
+    { "name": "factors", "description": "배출계수 카탈로그" },
+    { "name": "imports", "description": "Excel 임포트 확정" }
+  ],
+  "paths": {
+    "/companies": {
+      "get": {
+        "tags": ["companies"],
+        "summary": "회사 목록 조회",
+        "responses": {
+          "200": {
+            "description": "회사 배열",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Company" }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/SimulatedError" }
+        }
+      }
+    },
+    "/activities": {
+      "get": {
+        "tags": ["activities"],
+        "summary": "필터 적용 활동 데이터 조회",
+        "parameters": [
+          { "name": "companyId", "in": "query", "schema": { "type": "string" }, "description": "쉼표 구분 다중 가능. 미지정 시 전체" },
+          { "name": "from", "in": "query", "schema": { "$ref": "#/components/schemas/PeriodMonth" } },
+          { "name": "to", "in": "query", "schema": { "$ref": "#/components/schemas/PeriodMonth" } },
+          { "name": "scope", "in": "query", "schema": { "$ref": "#/components/schemas/Scope" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "활동 배열",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Activity" }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/SimulatedError" }
+        }
+      },
+      "post": {
+        "tags": ["activities"],
+        "summary": "활동 데이터 신규 추가 (낙관적 업데이트 대상)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ActivityInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "생성 성공",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Activity" }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 (음수 활동량, 단위 차원 불일치)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationError" }
+              }
+            }
+          },
+          "503": { "$ref": "#/components/responses/SimulatedFailure" }
+        }
+      }
+    },
+    "/activities/{id}": {
+      "patch": {
+        "tags": ["activities"],
+        "summary": "활동 데이터 일부 수정",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number", "minimum": 0 },
+                  "inputUnit": { "type": "string" },
+                  "period": { "$ref": "#/components/schemas/PeriodMonth" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정 성공 (audit 1건 추가됨)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Activity" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailure" },
+          "404": { "description": "존재하지 않는 활동 ID" },
+          "503": { "$ref": "#/components/responses/SimulatedFailure" }
+        }
+      },
+      "delete": {
+        "tags": ["activities"],
+        "summary": "활동 데이터 삭제",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "삭제 성공" },
+          "404": { "description": "존재하지 않는 ID" },
+          "503": { "$ref": "#/components/responses/SimulatedFailure" }
+        }
+      }
+    },
+    "/factors": {
+      "get": {
+        "tags": ["factors"],
+        "summary": "배출계수 카탈로그 조회",
+        "parameters": [
+          { "name": "activityType", "in": "query", "schema": { "type": "string" } },
+          { "name": "active", "in": "query", "schema": { "type": "boolean" }, "description": "true면 validTo === null인 현행만" }
+        ],
+        "responses": {
+          "200": {
+            "description": "계수 배열",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/EmissionFactor" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["factors"],
+        "summary": "신규 계수 등록 (이전 활성 계수의 validTo 자동 갱신)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmissionFactorInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록 성공",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/EmissionFactor" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationFailure" },
+          "503": { "$ref": "#/components/responses/SimulatedFailure" }
+        }
+      }
+    },
+    "/imports": {
+      "post": {
+        "tags": ["imports"],
+        "summary": "Excel 임포트 확정 (4단계). 클라이언트에서 검증 통과한 행만 전송됨",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rows"],
+                "properties": {
+                  "rows": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/ActivityInput" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "부분 실패 가능. 성공/실패 건수와 실패 행 목록 반환",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["success", "failed", "failures"],
+                  "properties": {
+                    "success": { "type": "integer", "minimum": 0 },
+                    "failed": { "type": "integer", "minimum": 0 },
+                    "failures": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["index", "reason"],
+                        "properties": {
+                          "index": { "type": "integer" },
+                          "reason": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": { "$ref": "#/components/responses/SimulatedFailure" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PeriodMonth": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+        "description": "YYYY-MM. 활동 데이터 표준 기간 단위 (clarification)."
+      },
+      "Scope": {
+        "type": "string",
+        "enum": ["scope1", "scope2", "scope3", "미매칭"]
+      },
+      "Lifecycle": {
+        "type": "string",
+        "enum": ["raw", "mfg", "dist", "use", "eol", "미매칭"]
+      },
+      "Company": {
+        "type": "object",
+        "required": ["id", "name", "country"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "country": { "type": "string" }
+        }
+      },
+      "FactorSnapshot": {
+        "type": "object",
+        "required": ["factorId", "name", "value", "unit", "validFrom", "version", "source"],
+        "properties": {
+          "factorId": { "type": "string" },
+          "name": { "type": "string" },
+          "value": { "type": "number" },
+          "unit": { "type": "string" },
+          "validFrom": { "$ref": "#/components/schemas/PeriodMonth" },
+          "version": { "type": "string" },
+          "source": { "type": "string" }
+        }
+      },
+      "AuditEntry": {
+        "type": "object",
+        "required": ["at", "actor", "action", "summary"],
+        "properties": {
+          "at": { "type": "string", "format": "date-time" },
+          "actor": { "type": "string", "enum": ["seed", "manual", "import", "optimistic-rollback"] },
+          "action": { "type": "string", "enum": ["create", "update", "delete", "rollback"] },
+          "summary": { "type": "string" }
+        }
+      },
+      "Activity": {
+        "type": "object",
+        "required": [
+          "id", "companyId", "activityType", "period",
+          "amount", "inputUnit", "standardUnit",
+          "scope", "lifecycle", "tCO2e",
+          "factorSnapshot", "outlierFlag",
+          "audit", "createdAt", "updatedAt"
+        ],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "companyId": { "type": "string" },
+          "activityType": { "type": "string" },
+          "period": { "$ref": "#/components/schemas/PeriodMonth" },
+          "amount": { "type": "number", "minimum": 0 },
+          "inputUnit": { "type": "string" },
+          "standardUnit": { "type": "string" },
+          "factorId": { "type": ["string", "null"] },
+          "scope": { "$ref": "#/components/schemas/Scope" },
+          "lifecycle": { "$ref": "#/components/schemas/Lifecycle" },
+          "tCO2e": { "type": "number", "minimum": 0 },
+          "factorSnapshot": { "$ref": "#/components/schemas/FactorSnapshot" },
+          "outlierFlag": { "type": "boolean" },
+          "audit": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AuditEntry" },
+            "minItems": 1
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ActivityInput": {
+        "type": "object",
+        "required": ["companyId", "activityType", "period", "amount", "inputUnit"],
+        "properties": {
+          "companyId": { "type": "string" },
+          "activityType": { "type": "string" },
+          "period": { "$ref": "#/components/schemas/PeriodMonth" },
+          "amount": { "type": "number", "minimum": 0 },
+          "inputUnit": { "type": "string" }
+        }
+      },
+      "EmissionFactor": {
+        "type": "object",
+        "required": ["id", "name", "activityType", "value", "unit", "validFrom", "source", "version", "createdBy", "createdAt"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "activityType": { "type": "string" },
+          "value": { "type": "number", "exclusiveMinimum": 0 },
+          "unit": { "type": "string" },
+          "validFrom": { "$ref": "#/components/schemas/PeriodMonth" },
+          "validTo": { "type": ["string", "null"], "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$" },
+          "source": { "type": "string" },
+          "version": { "type": "string" },
+          "createdBy": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "reason": { "type": ["string", "null"] }
+        }
+      },
+      "EmissionFactorInput": {
+        "type": "object",
+        "required": ["name", "activityType", "value", "unit", "validFrom", "source", "version"],
+        "properties": {
+          "name": { "type": "string" },
+          "activityType": { "type": "string" },
+          "value": { "type": "number", "exclusiveMinimum": 0 },
+          "unit": { "type": "string" },
+          "validFrom": { "$ref": "#/components/schemas/PeriodMonth" },
+          "source": { "type": "string" },
+          "version": { "type": "string" },
+          "reason": { "type": ["string", "null"] }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "required": ["error", "fields"],
+        "properties": {
+          "error": { "type": "string", "enum": ["validation"] },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["field", "code", "message"],
+              "properties": {
+                "field": { "type": "string" },
+                "code": { "type": "string", "enum": ["negative", "dimension-mismatch", "missing", "format"] },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "SimulatedError": {
+        "description": "메모리 store 내부 오류 (드물게 발생)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "SimulatedFailure": {
+        "description": "src/lib/api/simulate.ts 의 10~20% 시뮬레이션 실패 — 클라이언트는 자동 rollback + 토스트",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["error", "simulated"],
+              "properties": {
+                "error": { "type": "string", "example": "Simulated write failure" },
+                "simulated": { "type": "boolean", "example": true }
+              }
+            }
+          }
+        }
+      },
+      "ValidationFailure": {
+        "description": "도메인 검증 실패",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ValidationError" }
+          }
+        }
+      }
+    }
+  }
+}
