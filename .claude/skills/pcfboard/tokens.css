@@ -220,6 +220,3 @@
   overflow: hidden;
   box-shadow: var(--sh-2);
 }
-
-/* Fonts via Google */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap');
