@@ -108,10 +108,12 @@ const templates: ActivityTemplate[] = [
   },
 ];
 
+const factorMap = new Map(factors.map((f) => [f.id, f]));
+
 function computeTCO2e(amount: number, factorId: string): number {
-  const factor = factors.find((f) => f.id === factorId);
+  const factor = factorMap.get(factorId);
   if (!factor) return 0;
-  return Math.round((amount * factor.value) / 10) / 100; // tCO₂e, 2 decimal places
+  return Math.round((amount * factor.value) / 10) / 100;
 }
 
 function buildActivities(): Activity[] {

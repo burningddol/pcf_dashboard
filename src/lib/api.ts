@@ -74,6 +74,7 @@ export async function createActivity(
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
   };
-  getStore().activities = [...getStore().activities, activity];
+  const store = getStore();
+  store.activities = [...store.activities, activity];
   return activity;
 }
