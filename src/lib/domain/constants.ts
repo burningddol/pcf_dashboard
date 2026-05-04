@@ -7,9 +7,10 @@ export const ACTIVITY_LABELS: Record<ActivityType, string> = {
   transport: "운송",
 };
 
+// Scope 팔레트 기반: electricity(scope-2 teal), 나머지(scope-3 lime 계열)
 export const ACTIVITY_COLORS: Record<ActivityType, string> = {
-  electricity: "#3b82f6",
-  plastic1: "#f59e0b",
-  plastic2: "#f97316",
-  transport: "#10b981",
+  electricity: "#2a9d8f",
+  transport: "#4a90a4",
+  plastic1: "#a7c957",
+  plastic2: "#7a9e3a",
 };

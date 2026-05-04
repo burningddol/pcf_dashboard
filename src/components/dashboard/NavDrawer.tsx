@@ -12,18 +12,49 @@ export default function NavDrawer() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex h-screen w-52 shrink-0 flex-col border-r border-zinc-200 bg-white px-4 py-6">
-      <p className="mb-8 text-sm font-semibold tracking-tight text-zinc-900">HanaLoop PCF</p>
-      <ul className="flex flex-col gap-1">
+    <nav
+      style={{
+        width: 200,
+        flexShrink: 0,
+        height: "100vh",
+        borderRight: "1px solid var(--line)",
+        background: "var(--bg)",
+        padding: "24px 12px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+      }}
+    >
+      <p
+        style={{
+          fontSize: "var(--t-sm)",
+          fontWeight: 600,
+          color: "var(--fg)",
+          padding: "0 8px",
+          marginBottom: 16,
+          letterSpacing: "-0.01em",
+        }}
+      >
+        HanaLoop PCF
+      </p>
+      <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 2 }}>
         {NAV_ITEMS.map(({ href, label }) => (
           <li key={href}>
             <Link
               href={href}
-              className={`flex h-9 items-center rounded-md px-3 text-sm transition-colors ${
-                pathname === href
-                  ? "bg-zinc-100 font-medium text-zinc-900"
-                  : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
-              }`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                height: 32,
+                borderRadius: "var(--r-2)",
+                padding: "0 10px",
+                fontSize: "var(--t-sm)",
+                fontWeight: pathname === href ? 500 : 400,
+                color: pathname === href ? "var(--fg)" : "var(--fg-3)",
+                background: pathname === href ? "var(--bg-2)" : "transparent",
+                textDecoration: "none",
+                transition: "background .12s, color .12s",
+              }}
             >
               {label}
             </Link>

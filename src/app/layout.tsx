@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="flex h-screen bg-zinc-50 font-sans antialiased">
+      <body className="pcf flex h-screen" style={{ background: "var(--bg)" }}>
         <NavDrawer />
         <main className="flex-1 overflow-auto">{children}</main>
       </body>
