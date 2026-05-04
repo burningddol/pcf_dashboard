@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Company {
+  id         String     @id
+  name       String
+  country    String
+  activities Activity[]
+}
+
+model EmissionFactor {
+  id           String     @id
+  activityType String
+  value        Float
+  unit         String
+  version      Int
+  validFrom    String
+  source       String
+  activities   Activity[]
+}
+
+model Activity {
+  id           String         @id @default(uuid())
+  company      Company        @relation(fields: [companyId], references: [id])
+  companyId    String
+  factor       EmissionFactor @relation(fields: [factorId], references: [id])
+  factorId     String
+  activityType String
+  yearMonth    String
+  amount       Float
+  unit         String
+  tCO2e        Float
+  scope        String
+  createdAt    DateTime       @default(now())
+}
