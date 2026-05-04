@@ -9,12 +9,12 @@ import KpiSection from "@/components/dashboard/KpiSection";
 import EmissionsStackedBar from "@/components/charts/EmissionsStackedBar";
 import type { Activity } from "@/types";
 
-const KPI_SKELETON_COUNT = 4;
+const KPI_SKELETON_COUNT = 5;
 const CHART_BAR_HEIGHTS = [60, 80, 55, 90, 70, 85, 65, 95, 75, 88, 60, 78];
 
 function KpiSkeleton() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
       {Array.from({ length: KPI_SKELETON_COUNT }).map((_, i) => (
         <div key={i} className="card col" style={{ padding: "14px 18px", gap: 8 }}>
           <span className="skel" style={{ width: 90, height: 10 }} />
