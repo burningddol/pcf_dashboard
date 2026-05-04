@@ -5,24 +5,17 @@ import {
   factors as seedFactors,
 } from "./seed";
 
-// globalThis 패턴: Next.js dev 핫 리로드 시 메모리 초기화 방지
-declare global {
-  // eslint-disable-next-line no-var
-  var __store:
-    | { companies: Company[]; activities: Activity[]; factors: EmissionFactor[] }
-    | undefined;
+interface Store {
+  companies: Company[];
+  activities: Activity[];
+  factors: EmissionFactor[];
 }
 
-function getStore() {
-  if (!globalThis.__store) {
-    globalThis.__store = {
-      companies: [...seedCompanies],
-      activities: [...seedActivities],
-      factors: [...seedFactors],
-    };
-  }
-  return globalThis.__store;
-}
+const store: Store = {
+  companies: [...seedCompanies],
+  activities: [...seedActivities],
+  factors: [...seedFactors],
+};
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 const jitter = () => Math.floor(200 + Math.random() * 600);
@@ -31,12 +24,12 @@ const shouldFail = () =>
 
 export async function getCompanies(): Promise<Company[]> {
   await delay(jitter());
-  return [...getStore().companies];
+  return [...store.companies];
 }
 
 export async function getActivities(filter?: Partial<FilterState>): Promise<Activity[]> {
   await delay(jitter());
-  let result = [...getStore().activities];
+  let result = [...store.activities];
   if (filter?.companyId) result = result.filter((a) => a.companyId === filter.companyId);
   if (filter?.from) result = result.filter((a) => a.yearMonth >= filter.from!);
   if (filter?.to) result = result.filter((a) => a.yearMonth <= filter.to!);
@@ -45,7 +38,6 @@ export async function getActivities(filter?: Partial<FilterState>): Promise<Acti
 
 export async function getFactors(): Promise<EmissionFactor[]> {
   await delay(jitter());
-  const store = getStore();
   const latestVersionByType = new Map<string, number>();
 
   for (const f of store.factors) {
@@ -60,7 +52,7 @@ export async function getFactors(): Promise<EmissionFactor[]> {
 
 export async function getAllFactors(): Promise<EmissionFactor[]> {
   await delay(jitter());
-  return [...getStore().factors];
+  return [...store.factors];
 }
 
 export async function createActivity(
@@ -74,7 +66,6 @@ export async function createActivity(
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
   };
-  const store = getStore();
   store.activities = [...store.activities, activity];
   return activity;
 }
