@@ -7,7 +7,11 @@ export const metadata: Metadata = {
   description: "제품 탄소 발자국(PCF) 시각화 대시보드",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="ko">
       <body className="flex h-screen bg-zinc-50 font-sans antialiased">
