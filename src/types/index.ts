@@ -31,7 +31,6 @@ export interface Activity {
 }
 
 export interface FilterState {
-  companyId: string;
   from: string; // YYYY-MM
   to: string; // YYYY-MM
 }
