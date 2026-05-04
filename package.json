@@ -11,13 +11,18 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:invariant": "vitest run tests/domain/aggregate-invariant.spec.ts"
+    "test:invariant": "vitest run tests/domain/aggregate-invariant.spec.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@prisma/client": "^7.8.0",
     "@visx/sankey": "^3.12.0",
     "@visx/scale": "^3.12.0",
     "d3-sankey": "^0.12.3",
     "next": "16.2.4",
+    "prisma": "^7.8.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
@@ -40,6 +45,7 @@
     "jsdom": "^29.1.1",
     "prettier": "^3.8.3",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.1.5"
   }
