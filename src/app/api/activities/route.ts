@@ -10,8 +10,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   const activities = await prisma.activity.findMany({
     where: {
-      ...(from && { yearMonth: { gte: from } }),
-      ...(to && { yearMonth: { lte: to } }),
+      yearMonth: {
+        ...(from && { gte: from }),
+        ...(to && { lte: to }),
+      },
     },
     orderBy: { yearMonth: "asc" },
   });
