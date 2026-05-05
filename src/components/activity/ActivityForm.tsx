@@ -4,12 +4,11 @@ import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/cn";
+import { postJson } from "@/lib/fetcher";
 import { computeTCO2e } from "@/lib/domain/pcf";
 import { mapToScope } from "@/lib/domain/scope";
+import { COMPANY_ID, ACTIVITY_TYPES } from "@/lib/domain/constants";
 import type { Activity, ActivityType, CreateActivityBody, EmissionFactor } from "@/types";
-
-const ACTIVITY_TYPES: ActivityType[] = ["전기", "원소재", "운송"];
-const COMPANY_ID = "ct-045";
 
 interface ActivityFormProps {
   factors: EmissionFactor[];
@@ -60,15 +59,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
     selectedFactor && amount ? computeTCO2e(parseFloat(amount), selectedFactor.value) : null;
 
   const mutation = useMutation({
-    mutationFn: (body: CreateActivityBody) =>
-      fetch("/api/activities", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      }).then((res) => {
-        if (!res.ok) throw new Error("failed");
-        return res.json() as Promise<Activity>;
-      }),
+    mutationFn: (body: CreateActivityBody) => postJson<Activity>("/api/activities", body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["activities"] });
       reset({ activityType, factorId: "", description: "", yearMonth: "", amount: "" });

@@ -1,5 +1,8 @@
 import type { ActivityType, Scope } from "@/types";
 
+export const COMPANY_ID = "ct-045";
+export const ACTIVITY_TYPES: ActivityType[] = ["전기", "원소재", "운송"];
+
 export type LifecycleStage = "원료" | "제조" | "유통";
 
 export const LIFECYCLE_STAGE_LABEL: Record<LifecycleStage, string> = {
