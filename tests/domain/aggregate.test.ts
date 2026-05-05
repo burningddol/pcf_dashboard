@@ -46,11 +46,11 @@ describe("aggregateByMonth", () => {
     const result = aggregateByMonth(ACTIVITIES);
     expect(result).toHaveLength(2);
     expect(result[0].yearMonth).toBe("2025-01");
-    expect(result[0].electricity).toBe(0.46);
-    expect(result[0].transport).toBe(1.75);
+    expect(result[0].scope2).toBe(0.46);
+    expect(result[0].scope3).toBe(1.75);
     expect(result[0].total).toBeCloseTo(2.21);
     expect(result[1].yearMonth).toBe("2025-02");
-    expect(result[1].electricity).toBe(0.91);
+    expect(result[1].scope2).toBe(0.91);
   });
 
   it("yearMonth 오름차순으로 정렬한다", () => {

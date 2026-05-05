@@ -1,24 +1,26 @@
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ACTIVITY_LABELS, ACTIVITY_COLORS } from "@/lib/domain/constants";
-import type { ActivityType } from "@/types";
+import type { Scope } from "@/types";
 import type { MonthlyRow } from "@/lib/domain/aggregate";
 
-const ACTIVITY_TYPES: ActivityType[] = ["electricity", "plastic1", "plastic2", "transport"];
+type ScopeConfig = { key: Scope; label: string; color: string; radius: [number, number, number, number] };
 
-const BAR_RADIUS: Record<ActivityType, [number, number, number, number]> = {
-  electricity: [0, 0, 0, 0],
-  plastic1: [0, 0, 0, 0],
-  plastic2: [0, 0, 0, 0],
-  transport: [3, 3, 0, 0],
-};
+const SCOPES: ScopeConfig[] = [
+  { key: "scope1", label: "Scope 1", color: "var(--scope-1)", radius: [0, 0, 0, 0] },
+  { key: "scope2", label: "Scope 2", color: "var(--scope-2)", radius: [0, 0, 0, 0] },
+  { key: "scope3", label: "Scope 3", color: "var(--scope-3)", radius: [3, 3, 0, 0] },
+];
+
+function getScopeLabel(key: string | number | undefined): string {
+  return SCOPES.find((s) => s.key === key)?.label ?? String(key ?? "");
+}
 
 interface EmissionsStackedBarProps {
   data: MonthlyRow[];
 }
 
-export default function EmissionsStackedBar({ data }: EmissionsStackedBarProps) {
+export default function EmissionsStackedBar({ data }: EmissionsStackedBarProps): React.ReactElement {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }} barCategoryGap="35%">
@@ -46,7 +48,7 @@ export default function EmissionsStackedBar({ data }: EmissionsStackedBarProps) 
           }}
           formatter={(v, key) => [
             `${typeof v === "number" ? v.toFixed(2) : v} tCO₂e`,
-            ACTIVITY_LABELS[key as ActivityType] ?? key,
+            getScopeLabel(key),
           ]}
         />
         <Legend
@@ -54,12 +56,12 @@ export default function EmissionsStackedBar({ data }: EmissionsStackedBarProps) 
           iconSize={8}
           formatter={(key: string) => (
             <span style={{ fontSize: 11, color: "var(--fg-3)" }}>
-              {ACTIVITY_LABELS[key as ActivityType] ?? key}
+              {getScopeLabel(key)}
             </span>
           )}
         />
-        {ACTIVITY_TYPES.map((type) => (
-          <Bar key={type} dataKey={type} stackId="a" fill={ACTIVITY_COLORS[type]} radius={BAR_RADIUS[type]} />
+        {SCOPES.map(({ key, color, radius }) => (
+          <Bar key={key} dataKey={key} stackId="a" fill={color} radius={radius} />
         ))}
       </BarChart>
     </ResponsiveContainer>

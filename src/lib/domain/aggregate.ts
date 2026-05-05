@@ -2,10 +2,9 @@ import type { Activity, ActivityType } from "@/types";
 
 export interface MonthlyRow {
   yearMonth: string;
-  electricity: number;
-  plastic1: number;
-  plastic2: number;
-  transport: number;
+  scope1: number;
+  scope2: number;
+  scope3: number;
   total: number;
 }
 
@@ -19,17 +18,10 @@ export function aggregateByMonth(activities: Activity[]): MonthlyRow[] {
 
   for (const a of activities) {
     if (!map.has(a.yearMonth)) {
-      map.set(a.yearMonth, {
-        yearMonth: a.yearMonth,
-        electricity: 0,
-        plastic1: 0,
-        plastic2: 0,
-        transport: 0,
-        total: 0,
-      });
+      map.set(a.yearMonth, { yearMonth: a.yearMonth, scope1: 0, scope2: 0, scope3: 0, total: 0 });
     }
     const row = map.get(a.yearMonth)!;
-    row[a.activityType] += a.tCO2e;
+    row[a.scope] += a.tCO2e;
     row.total += a.tCO2e;
   }
 
