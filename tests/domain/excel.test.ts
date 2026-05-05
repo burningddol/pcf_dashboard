@@ -95,7 +95,7 @@ describe("parseExcel", () => {
     vi.spyOn(FileReader.prototype, "readAsArrayBuffer").mockImplementationOnce(function (
       this: FileReader,
     ) {
-      setTimeout(() => this.onerror?.(new ProgressEvent("error")), 0);
+      setTimeout(() => this.onerror?.(new ProgressEvent("error") as ProgressEvent<FileReader>), 0);
     });
     await expect(parseExcel(file)).rejects.toThrow("파일을 읽는 데 실패했습니다.");
   });
