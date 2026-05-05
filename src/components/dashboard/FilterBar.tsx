@@ -7,7 +7,9 @@ export default function FilterBar() {
 
   return (
     <div className="row" style={{ gap: 8 }}>
-      <span className="muted" style={{ fontSize: "var(--t-xs)" }}>기간</span>
+      <span className="muted" style={{ fontSize: "var(--t-xs)" }}>
+        기간
+      </span>
       <input
         type="month"
         value={filter.from}
@@ -15,7 +17,9 @@ export default function FilterBar() {
         onChange={(e) => setFilter({ ...filter, from: e.target.value })}
         className="input"
       />
-      <span className="muted" style={{ fontSize: "var(--t-xs)" }}>~</span>
+      <span className="muted" style={{ fontSize: "var(--t-xs)" }}>
+        ~
+      </span>
       <input
         type="month"
         value={filter.to}

@@ -15,7 +15,12 @@ export default function KpiCard({ label, value, unit, sub }: KpiCardProps) {
       <p style={{ display: "flex", alignItems: "baseline", gap: 4, marginTop: 2 }}>
         <span
           className="num"
-          style={{ fontSize: "var(--t-display)", fontWeight: 600, letterSpacing: "-0.02em", color: "var(--fg)" }}
+          style={{
+            fontSize: "var(--t-display)",
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            color: "var(--fg)",
+          }}
         >
           {value}
         </span>

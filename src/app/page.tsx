@@ -29,7 +29,11 @@ function ChartSkeleton() {
   return (
     <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 200, padding: "0 8px" }}>
       {CHART_BAR_HEIGHTS.map((h, i) => (
-        <span key={i} className="skel" style={{ flex: 1, height: `${h}%`, borderRadius: "var(--r-1)" }} />
+        <span
+          key={i}
+          className="skel"
+          style={{ flex: 1, height: `${h}%`, borderRadius: "var(--r-1)" }}
+        />
       ))}
     </div>
   );
@@ -37,10 +41,11 @@ function ChartSkeleton() {
 
 export default function OverviewPage() {
   const { filter } = useFilterStore();
-  const { data: activities, isLoading, error } = useSWR<Activity[]>(
-    `/api/activities?from=${filter.from}&to=${filter.to}`,
-    fetcher,
-  );
+  const {
+    data: activities,
+    isLoading,
+    error,
+  } = useSWR<Activity[]>(`/api/activities?from=${filter.from}&to=${filter.to}`, fetcher);
 
   return (
     <div className="col" style={{ padding: 32, gap: 24 }}>
@@ -50,8 +55,17 @@ export default function OverviewPage() {
       </div>
 
       {error && (
-        <div style={{ background: "var(--neg-soft)", border: "1px solid var(--neg)", borderRadius: "var(--r-3)", padding: "12px 16px" }}>
-          <p style={{ fontSize: "var(--t-sm)", color: "var(--neg)", fontWeight: 500 }}>데이터를 불러오지 못했습니다.</p>
+        <div
+          style={{
+            background: "var(--neg-soft)",
+            border: "1px solid var(--neg)",
+            borderRadius: "var(--r-3)",
+            padding: "12px 16px",
+          }}
+        >
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--neg)", fontWeight: 500 }}>
+            데이터를 불러오지 못했습니다.
+          </p>
         </div>
       )}
 
@@ -67,8 +81,12 @@ export default function OverviewPage() {
           <KpiSection activities={activities ?? []} />
           <div className="card">
             <div className="card-h">
-              <p style={{ fontSize: "var(--t-sm)", fontWeight: 500, color: "var(--fg-2)" }}>월별 배출량</p>
-              <span className="muted" style={{ fontSize: "var(--t-xs)" }}>단위: tCO₂e</span>
+              <p style={{ fontSize: "var(--t-sm)", fontWeight: 500, color: "var(--fg-2)" }}>
+                월별 배출량
+              </p>
+              <span className="muted" style={{ fontSize: "var(--t-xs)" }}>
+                단위: tCO₂e
+              </span>
             </div>
             <div className="card-b">
               <EmissionsStackedBar data={aggregateByMonth(activities ?? [])} />

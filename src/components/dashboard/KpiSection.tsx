@@ -25,7 +25,7 @@ function computeScopeTotals(activities: Activity[]): ScopeTotals {
       else acc.scope3 += a.tCO2e;
       return acc;
     },
-    { total: 0, scope1: 0, scope2: 0, scope3: 0 },
+    { total: 0, scope1: 0, scope2: 0, scope3: 0 }
   );
 }
 

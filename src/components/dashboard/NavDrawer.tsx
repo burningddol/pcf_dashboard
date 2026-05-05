@@ -37,7 +37,16 @@ export default function NavDrawer() {
       >
         HanaLoop PCF
       </p>
-      <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+      <ul
+        style={{
+          listStyle: "none",
+          margin: 0,
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
         {NAV_ITEMS.map(({ href, label }) => (
           <li key={href}>
             <Link

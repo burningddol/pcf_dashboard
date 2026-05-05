@@ -1,10 +1,24 @@
 "use client";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import type { Scope } from "@/types";
 import type { MonthlyRow } from "@/lib/domain/aggregate";
 
-type ScopeConfig = { key: Scope; label: string; color: string; radius: [number, number, number, number] };
+type ScopeConfig = {
+  key: Scope;
+  label: string;
+  color: string;
+  radius: [number, number, number, number];
+};
 
 const SCOPES: ScopeConfig[] = [
   { key: "scope1", label: "Scope 1", color: "var(--scope-1)", radius: [0, 0, 0, 0] },
@@ -20,7 +34,9 @@ interface EmissionsStackedBarProps {
   data: MonthlyRow[];
 }
 
-export default function EmissionsStackedBar({ data }: EmissionsStackedBarProps): React.ReactElement {
+export default function EmissionsStackedBar({
+  data,
+}: EmissionsStackedBarProps): React.ReactElement {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }} barCategoryGap="35%">
@@ -55,9 +71,7 @@ export default function EmissionsStackedBar({ data }: EmissionsStackedBarProps):
           iconType="square"
           iconSize={8}
           formatter={(key: string) => (
-            <span style={{ fontSize: 11, color: "var(--fg-3)" }}>
-              {getScopeLabel(key)}
-            </span>
+            <span style={{ fontSize: 11, color: "var(--fg-3)" }}>{getScopeLabel(key)}</span>
           )}
         />
         {SCOPES.map(({ key, color, radius }) => (
