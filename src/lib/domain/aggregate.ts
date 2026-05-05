@@ -1,4 +1,6 @@
-import type { Activity, ActivityType } from "@/types";
+import type { Activity, ActivityType, Scope } from "@/types";
+import { SCOPE_LABEL } from "./constants";
+import { mapToScope } from "./scope";
 
 export interface MonthlyRow {
   yearMonth: string;
@@ -38,4 +40,79 @@ export function aggregateBySource(activities: Activity[]): SourceSummary[] {
   return Array.from(map.entries())
     .map(([activityType, tCO2e]) => ({ activityType, tCO2e }))
     .sort((a, b) => b.tCO2e - a.tCO2e);
+}
+
+export interface SankeyNodeDatum {
+  id: string;
+  label: string;
+  kind: "activity" | "category" | "scope" | "total";
+}
+
+export interface SankeyLinkDatum {
+  source: string;
+  target: string;
+  value: number;
+}
+
+export interface SankeyInput {
+  nodes: SankeyNodeDatum[];
+  links: SankeyLinkDatum[];
+  total: number;
+}
+
+export function aggregateForSankey(activities: Activity[]): SankeyInput {
+  if (activities.length === 0) return { nodes: [], links: [], total: 0 };
+
+  const descriptionTotals = new Map<string, number>();
+  const activityTypeTotals = new Map<string, number>();
+  const scopeTotals = new Map<string, number>();
+  const descriptionToType = new Map<string, string>();
+
+  for (const a of activities) {
+    descriptionTotals.set(a.description, (descriptionTotals.get(a.description) ?? 0) + a.tCO2e);
+    activityTypeTotals.set(a.activityType, (activityTypeTotals.get(a.activityType) ?? 0) + a.tCO2e);
+    scopeTotals.set(a.scope, (scopeTotals.get(a.scope) ?? 0) + a.tCO2e);
+    descriptionToType.set(a.description, a.activityType);
+  }
+
+  const total = Array.from(scopeTotals.values()).reduce((s, v) => s + v, 0);
+
+  const nodes: SankeyNodeDatum[] = [
+    ...Array.from(descriptionTotals.keys()).map((desc) => ({
+      id: desc,
+      label: desc,
+      kind: "activity" as const,
+    })),
+    ...Array.from(activityTypeTotals.keys()).map((type) => ({
+      id: type,
+      label: type,
+      kind: "category" as const,
+    })),
+    ...Array.from(scopeTotals.keys()).map((scope) => ({
+      id: scope,
+      label: SCOPE_LABEL[scope as Scope],
+      kind: "scope" as const,
+    })),
+    { id: "total", label: "Total PCF", kind: "total" as const },
+  ];
+
+  const links: SankeyLinkDatum[] = [
+    ...Array.from(descriptionTotals.entries()).map(([desc, value]) => ({
+      source: desc,
+      target: descriptionToType.get(desc)!,
+      value,
+    })),
+    ...Array.from(activityTypeTotals.entries()).map(([type, value]) => ({
+      source: type,
+      target: mapToScope(type as ActivityType),
+      value,
+    })),
+    ...Array.from(scopeTotals.entries()).map(([scope, value]) => ({
+      source: scope,
+      target: "total",
+      value,
+    })),
+  ];
+
+  return { nodes, links, total };
 }

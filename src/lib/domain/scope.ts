@@ -1,10 +1,9 @@
 import type { ActivityType, Scope } from "@/types";
 
 const SCOPE_MAP: Record<ActivityType, Scope> = {
-  electricity: "scope2",
-  plastic1: "scope3",
-  plastic2: "scope3",
-  transport: "scope3",
+  전기: "scope2",
+  원소재: "scope3",
+  운송: "scope3",
 };
 
 export function mapToScope(activityType: ActivityType): Scope {
