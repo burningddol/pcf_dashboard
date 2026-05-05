@@ -1,4 +1,5 @@
-import type { Activity, ActivityType } from "@/types";
+import type { Activity, ActivityType, Scope } from "@/types";
+import { SCOPE_LABEL } from "./constants";
 
 export interface MonthlyRow {
   yearMonth: string;
@@ -43,7 +44,7 @@ export function aggregateBySource(activities: Activity[]): SourceSummary[] {
 export interface SankeyNodeDatum {
   id: string;
   label: string;
-  kind: "activity" | "category" | "total";
+  kind: "activity" | "category" | "scope" | "total";
 }
 
 export interface SankeyLinkDatum {
@@ -63,15 +64,19 @@ export function aggregateForSankey(activities: Activity[]): SankeyInput {
 
   const descriptionTotals = new Map<string, number>();
   const activityTypeTotals = new Map<string, number>();
+  const scopeTotals = new Map<string, number>();
   const descriptionToType = new Map<string, string>();
+  const activityTypeToScope = new Map<string, string>();
 
   for (const a of activities) {
     descriptionTotals.set(a.description, (descriptionTotals.get(a.description) ?? 0) + a.tCO2e);
     activityTypeTotals.set(a.activityType, (activityTypeTotals.get(a.activityType) ?? 0) + a.tCO2e);
+    scopeTotals.set(a.scope, (scopeTotals.get(a.scope) ?? 0) + a.tCO2e);
     descriptionToType.set(a.description, a.activityType);
+    activityTypeToScope.set(a.activityType, a.scope);
   }
 
-  const total = Array.from(activityTypeTotals.values()).reduce((s, v) => s + v, 0);
+  const total = Array.from(scopeTotals.values()).reduce((s, v) => s + v, 0);
 
   const nodes: SankeyNodeDatum[] = [
     ...Array.from(descriptionTotals.keys()).map((desc) => ({
@@ -84,6 +89,11 @@ export function aggregateForSankey(activities: Activity[]): SankeyInput {
       label: type,
       kind: "category" as const,
     })),
+    ...Array.from(scopeTotals.keys()).map((scope) => ({
+      id: scope,
+      label: SCOPE_LABEL[scope as Scope],
+      kind: "scope" as const,
+    })),
     { id: "total", label: "Total PCF", kind: "total" as const },
   ];
 
@@ -95,6 +105,11 @@ export function aggregateForSankey(activities: Activity[]): SankeyInput {
     })),
     ...Array.from(activityTypeTotals.entries()).map(([type, value]) => ({
       source: type,
+      target: activityTypeToScope.get(type)!,
+      value,
+    })),
+    ...Array.from(scopeTotals.entries()).map(([scope, value]) => ({
+      source: scope,
       target: "total",
       value,
     })),

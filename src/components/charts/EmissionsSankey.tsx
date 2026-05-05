@@ -3,11 +3,11 @@
 import { useMemo } from "react";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import type { SankeyNode, SankeyLink } from "d3-sankey";
-import { CATEGORY_COLOR } from "@/lib/domain/constants";
+import { CATEGORY_COLOR, SCOPE_COLOR } from "@/lib/domain/constants";
 import type { SankeyInput, SankeyNodeDatum, SankeyLinkDatum } from "@/lib/domain/aggregate";
-import type { ActivityType } from "@/types";
+import type { ActivityType, Scope } from "@/types";
 
-const VIEW_W = 920;
+const VIEW_W = 960;
 const VIEW_H = 300;
 const NODE_W = 14;
 const NODE_PAD = 14;
@@ -20,6 +20,7 @@ type LayoutLink = SankeyLink<SankeyNodeDatum, SankeyLinkDatum>;
 function resolveNodeColor(node: LayoutNode): string {
   if (node.kind === "activity") return "var(--fg-4)";
   if (node.kind === "category") return CATEGORY_COLOR[node.label as ActivityType] ?? "var(--fg-3)";
+  if (node.kind === "scope") return SCOPE_COLOR[node.id as Scope] ?? "var(--fg-3)";
   return "var(--fg-2)";
 }
 
@@ -70,6 +71,34 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
             fontFamily="var(--font-mono)"
           >
             {(node.value ?? 0).toFixed(2)} t
+          </text>
+        </>
+      );
+    case "scope":
+      if (height <= 28) return null;
+      return (
+        <>
+          <text
+            x={(x0 + x1) / 2}
+            y={midY - 7}
+            textAnchor="middle"
+            fontSize={10}
+            fontWeight={600}
+            fill="white"
+            dominantBaseline="middle"
+          >
+            {node.label}
+          </text>
+          <text
+            x={(x0 + x1) / 2}
+            y={midY + 7}
+            textAnchor="middle"
+            fontSize={9}
+            fill="rgba(255,255,255,0.8)"
+            dominantBaseline="middle"
+            fontFamily="var(--font-mono)"
+          >
+            {total > 0 ? (((node.value ?? 0) / total) * 100).toFixed(0) : 0}%
           </text>
         </>
       );
@@ -186,7 +215,7 @@ export default function EmissionsSankey({ data }: EmissionsSankeyProps): React.R
             fill={resolveNodeColor(node)}
             rx={2}
           />
-          {renderNodeLabel(node, total)}
+          <g>{renderNodeLabel(node, total)}</g>
         </g>
       ))}
     </svg>

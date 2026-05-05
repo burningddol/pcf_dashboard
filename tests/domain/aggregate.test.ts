@@ -82,10 +82,11 @@ describe("aggregateBySource", () => {
 });
 
 describe("aggregateForSankey", () => {
-  it("3단계 노드(설명→활동유형→total)를 생성한다", () => {
+  it("4단계 노드(설명→활동유형→Scope→total)를 생성한다", () => {
     const result = aggregateForSankey(ACTIVITIES);
     expect(result.nodes.find((n) => n.id === "한국전력")?.kind).toBe("activity");
     expect(result.nodes.find((n) => n.id === "전기")?.kind).toBe("category");
+    expect(result.nodes.find((n) => n.id === "scope2")?.kind).toBe("scope");
     expect(result.nodes.find((n) => n.id === "total")?.kind).toBe("total");
   });
 
@@ -94,10 +95,11 @@ describe("aggregateForSankey", () => {
     expect(result.total).toBeCloseTo(0.46 + 1.75 + 0.91);
   });
 
-  it("설명 → 활동유형 → total 링크가 존재한다", () => {
+  it("설명→활동유형→Scope→total 링크가 존재한다", () => {
     const result = aggregateForSankey(ACTIVITIES);
     expect(result.links.find((l) => l.source === "한국전력" && l.target === "전기")).toBeDefined();
-    expect(result.links.find((l) => l.source === "전기" && l.target === "total")?.value).toBeCloseTo(0.46 + 0.91);
+    expect(result.links.find((l) => l.source === "전기" && l.target === "scope2")).toBeDefined();
+    expect(result.links.find((l) => l.source === "scope2" && l.target === "total")?.value).toBeCloseTo(0.46 + 0.91);
   });
 
   it("빈 배열이면 빈 노드/링크를 반환한다", () => {
