@@ -1,24 +1,24 @@
 import { read, utils } from "xlsx";
 import { mapToScope } from "@/lib/domain/scope";
+import { COMPANY_ID, ACTIVITY_TYPES } from "@/lib/domain/constants";
 import type { ActivityType, CreateActivityBody } from "@/types";
 
-const COMPANY_ID = "ct-045";
-const ACTIVITY_TYPES = new Set<string>(["전기", "원소재", "운송"]);
+const ACTIVITY_TYPE_SET = new Set<string>(ACTIVITY_TYPES);
 
-const FACTOR_MAP: Record<string, Record<string, string>> = {
-  전기: { default: "ef-electricity-v1" },
-  운송: { default: "ef-transport-v1" },
-  원소재: { "1": "ef-plastic1-v1", "2": "ef-plastic2-v1", default: "ef-plastic1-v1" },
+const FACTOR_ID: Record<string, string> = {
+  전기: "ef-electricity-v1",
+  운송: "ef-transport-v1",
+  "원소재-1": "ef-plastic1-v1",
+  "원소재-2": "ef-plastic2-v1",
+  원소재: "ef-plastic1-v1",
 };
 
 function inferFactorId(activityType: string, description: string): string {
-  const factors = FACTOR_MAP[activityType];
-  if (!factors) return "";
   if (activityType === "원소재") {
-    if (description.includes("2")) return factors["2"];
-    if (description.includes("1")) return factors["1"];
+    if (description.includes("2")) return FACTOR_ID["원소재-2"];
+    if (description.includes("1")) return FACTOR_ID["원소재-1"];
   }
-  return factors.default;
+  return FACTOR_ID[activityType] ?? "";
 }
 
 export function parseExcel(file: File): Promise<CreateActivityBody[]> {
@@ -42,19 +42,16 @@ export function parseExcel(file: File): Promise<CreateActivityBody[]> {
             string,
           ];
 
-          if (!date || !ACTIVITY_TYPES.has(activityType) || !amount) continue;
-
-          const yearMonth = String(date).slice(0, 7);
-          const factorId = inferFactorId(activityType, description);
+          if (!date || !ACTIVITY_TYPE_SET.has(activityType) || !amount) continue;
 
           bodies.push({
             companyId: COMPANY_ID,
             activityType: activityType as ActivityType,
             description,
-            yearMonth,
+            yearMonth: String(date).slice(0, 7),
             amount: Number(amount),
             unit,
-            factorId,
+            factorId: inferFactorId(activityType, description),
             scope: mapToScope(activityType as ActivityType),
           });
         }
