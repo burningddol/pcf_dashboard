@@ -23,16 +23,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const body = await req.json();
-  const { companyId, activityType, description, yearMonth, amount, unit, factorId, scope } = body as {
-    companyId: string;
-    activityType: ActivityType;
-    description: string;
-    yearMonth: string;
-    amount: number;
-    unit: string;
-    factorId: string;
-    scope: Scope;
-  };
+  const { companyId, activityType, description, yearMonth, amount, unit, factorId, scope } =
+    body as {
+      companyId: string;
+      activityType: ActivityType;
+      description: string;
+      yearMonth: string;
+      amount: number;
+      unit: string;
+      factorId: string;
+      scope: Scope;
+    };
 
   const factor = await prisma.emissionFactor.findUnique({
     where: { id: factorId },
