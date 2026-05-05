@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getFactors } from "@/lib/api";
 
 export async function GET(): Promise<NextResponse> {
-  const factors = await prisma.emissionFactor.findMany({
-    orderBy: [{ activityType: "asc" }, { version: "desc" }],
-  });
-
+  const factors = await getFactors();
   return NextResponse.json(factors);
 }

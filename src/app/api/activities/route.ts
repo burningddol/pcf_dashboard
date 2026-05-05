@@ -1,53 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { computeTCO2e } from "@/lib/domain/pcf";
-import type { ActivityType, Scope } from "@/types";
+import { getActivities, createActivity, SimulatedWriteError, InvalidFactorError } from "@/lib/api";
+import type { CreateActivityBody } from "@/lib/api";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const { searchParams } = req.nextUrl;
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
-  const activities = await prisma.activity.findMany({
-    where: {
-      yearMonth: {
-        ...(from && { gte: from }),
-        ...(to && { lte: to }),
-      },
-    },
-    orderBy: { yearMonth: "asc" },
-  });
-
+  const activities = await getActivities(from, to);
   return NextResponse.json(activities);
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const body = await req.json();
-  const { companyId, activityType, description, yearMonth, amount, unit, factorId, scope } =
-    body as {
-      companyId: string;
-      activityType: ActivityType;
-      description: string;
-      yearMonth: string;
-      amount: number;
-      unit: string;
-      factorId: string;
-      scope: Scope;
-    };
+  const body: CreateActivityBody = await req.json();
 
-  const factor = await prisma.emissionFactor.findUnique({
-    where: { id: factorId },
-    select: { value: true },
-  });
-  if (!factor) {
-    return NextResponse.json({ error: "Invalid factorId" }, { status: 400 });
+  try {
+    const activity = await createActivity(body);
+    return NextResponse.json(activity, { status: 201 });
+  } catch (err) {
+    if (err instanceof SimulatedWriteError) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+    if (err instanceof InvalidFactorError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
+    throw err;
   }
-
-  const tCO2e = computeTCO2e(amount, factor.value);
-
-  const activity = await prisma.activity.create({
-    data: { companyId, activityType, description, yearMonth, amount, unit, factorId, tCO2e, scope },
-  });
-
-  return NextResponse.json(activity, { status: 201 });
 }

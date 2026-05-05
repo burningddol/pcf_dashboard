@@ -35,3 +35,14 @@ export interface FilterState {
   from: string;
   to: string;
 }
+
+export interface CreateActivityBody {
+  companyId: string;
+  activityType: ActivityType;
+  description: string;
+  yearMonth: string;
+  amount: number;
+  unit: string;
+  factorId: string;
+  scope: Scope;
+}
