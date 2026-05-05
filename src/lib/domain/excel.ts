@@ -18,7 +18,7 @@ function inferFactorId(activityType: string, description: string): string {
     if (description.includes("2")) return FACTOR_ID["원소재-2"];
     if (description.includes("1")) return FACTOR_ID["원소재-1"];
   }
-  return FACTOR_ID[activityType] ?? "";
+  return FACTOR_ID[activityType]!;
 }
 
 export function parseExcel(file: File): Promise<CreateActivityBody[]> {
