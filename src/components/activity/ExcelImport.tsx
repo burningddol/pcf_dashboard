@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/lib/cn";
 import { parseExcel } from "@/lib/domain/excel";
 import { postJson } from "@/lib/fetcher";
 import type { Activity, CreateActivityBody } from "@/types";
@@ -76,8 +77,10 @@ export default function ExcelImport() {
       />
       <label
         htmlFor="excel-import"
-        className="px-3 py-1.5 rounded-[var(--r-2)] text-[12px] font-medium border border-[color:var(--line)] text-[color:var(--fg-2)] cursor-pointer hover:bg-[color:var(--bg-2)]"
-        style={{ pointerEvents: isPending ? "none" : "auto", opacity: isPending ? 0.6 : 1 }}
+        className={cn(
+          "px-3 py-1.5 rounded-[var(--r-2)] text-[12px] font-medium border border-[color:var(--line)] text-[color:var(--fg-2)] cursor-pointer hover:bg-[color:var(--bg-2)]",
+          isPending && "pointer-events-none opacity-60"
+        )}
       >
         {isPending ? "가져오는 중…" : "Excel 가져오기"}
       </label>

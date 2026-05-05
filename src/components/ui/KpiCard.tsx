@@ -7,26 +7,15 @@ interface KpiCardProps {
 
 export default function KpiCard({ label, value, unit, sub }: KpiCardProps) {
   return (
-    <div
-      className="card"
-      style={{ padding: "14px 18px 14px", display: "flex", flexDirection: "column", gap: 4 }}
-    >
+    <div className="card flex flex-col gap-1 px-[18px] py-[14px]">
       <p className="micro">{label}</p>
-      <p style={{ display: "flex", alignItems: "baseline", gap: 4, marginTop: 2 }}>
-        <span
-          className="num"
-          style={{
-            fontSize: "var(--t-display)",
-            fontWeight: 600,
-            letterSpacing: "-0.02em",
-            color: "var(--fg)",
-          }}
-        >
+      <p className="flex items-baseline gap-1 mt-0.5">
+        <span className="num text-[length:var(--t-display)] font-semibold tracking-[-0.02em] text-[color:var(--fg)]">
           {value}
         </span>
-        <span style={{ fontSize: "var(--t-xs)", color: "var(--fg-3)" }}>{unit}</span>
+        <span className="text-[length:var(--t-xs)] text-[color:var(--fg-3)]">{unit}</span>
       </p>
-      {sub && <p style={{ fontSize: "var(--t-xs)", color: "var(--fg-3)" }}>{sub}</p>}
+      {sub && <p className="text-[length:var(--t-xs)] text-[color:var(--fg-3)]">{sub}</p>}
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/cn";
 import { fetcher } from "@/lib/fetcher";
 import { useFilterStore } from "@/stores/filter";
 import { aggregateByMonth, aggregateForSankey } from "@/lib/domain/aggregate";
@@ -18,11 +19,11 @@ const CHART_BAR_HEIGHTS = [60, 80, 55, 90, 70, 85, 65, 95, 75, 88, 60, 78];
 
 function KpiSkeleton() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
+    <div className="grid grid-cols-5 gap-3">
       {Array.from({ length: KPI_SKELETON_COUNT }).map((_, i) => (
-        <div key={i} className="card col" style={{ padding: "14px 18px", gap: 8 }}>
-          <span className="skel" style={{ width: 90, height: 10 }} />
-          <span className="skel" style={{ width: 130, height: 24 }} />
+        <div key={i} className="card flex flex-col gap-2 px-[18px] py-[14px]">
+          <span className="skel w-[90px] h-2.5" />
+          <span className="skel w-[130px] h-6" />
         </div>
       ))}
     </div>
@@ -31,27 +32,13 @@ function KpiSkeleton() {
 
 function ChartSkeleton() {
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 200, padding: "0 8px" }}>
+    <div className="flex items-end gap-2 h-[200px] px-2">
       {CHART_BAR_HEIGHTS.map((h, i) => (
-        <span
-          key={i}
-          className="skel"
-          style={{ flex: 1, height: `${h}%`, borderRadius: "var(--r-1)" }}
-        />
+        <span key={i} className="skel flex-1 rounded-[var(--r-1)]" style={{ height: `${h}%` }} />
       ))}
     </div>
   );
 }
-
-const TAB_STYLE_BASE: React.CSSProperties = {
-  fontSize: "var(--t-xs)",
-  fontWeight: 500,
-  padding: "4px 12px",
-  borderRadius: "var(--r-2)",
-  border: "none",
-  cursor: "pointer",
-  transition: "background 0.15s, color 0.15s",
-};
 
 function TabButton({
   active,
@@ -65,11 +52,12 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      style={{
-        ...TAB_STYLE_BASE,
-        background: active ? "var(--fg)" : "transparent",
-        color: active ? "var(--bg)" : "var(--fg-3)",
-      }}
+      className={cn(
+        "text-[length:var(--t-xs)] font-medium px-3 py-1 rounded-[var(--r-2)] border-0 cursor-pointer transition-[background,color] duration-150",
+        active
+          ? "bg-[color:var(--fg)] text-[color:var(--bg)]"
+          : "bg-transparent text-[color:var(--fg-3)]"
+      )}
     >
       {children}
     </button>
@@ -90,22 +78,15 @@ export default function OverviewPage() {
   });
 
   return (
-    <div className="col" style={{ padding: 32, gap: 24 }}>
-      <div className="between">
-        <h1 style={{ fontSize: "var(--t-h2)", fontWeight: 600, color: "var(--fg)" }}>Overview</h1>
+    <div className="flex flex-col p-8 gap-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-[length:var(--t-h2)] font-semibold text-[color:var(--fg)]">Overview</h1>
         <FilterBar />
       </div>
 
       {error && (
-        <div
-          style={{
-            background: "var(--neg-soft)",
-            border: "1px solid var(--neg)",
-            borderRadius: "var(--r-3)",
-            padding: "12px 16px",
-          }}
-        >
-          <p style={{ fontSize: "var(--t-sm)", color: "var(--neg)", fontWeight: 500 }}>
+        <div className="bg-[color:var(--neg-soft)] border border-[color:var(--neg)] rounded-[var(--r-3)] px-4 py-3">
+          <p className="text-[length:var(--t-sm)] text-[color:var(--neg)] font-medium">
             데이터를 불러오지 못했습니다.
           </p>
         </div>
@@ -114,7 +95,7 @@ export default function OverviewPage() {
       {isLoading ? (
         <>
           <KpiSkeleton />
-          <div className="card" style={{ padding: 24 }}>
+          <div className="card p-6">
             <ChartSkeleton />
           </div>
         </>
@@ -123,7 +104,7 @@ export default function OverviewPage() {
           <KpiSection activities={activities ?? []} />
           <div className="card">
             <div className="card-h">
-              <div className="row" style={{ gap: 4 }}>
+              <div className="flex items-center gap-1">
                 <TabButton active={chartTab === "sankey"} onClick={() => setChartTab("sankey")}>
                   PCF Sankey
                 </TabButton>
@@ -131,9 +112,7 @@ export default function OverviewPage() {
                   월별 배출량
                 </TabButton>
               </div>
-              <span className="muted" style={{ fontSize: "var(--t-xs)" }}>
-                단위: tCO₂e
-              </span>
+              <span className="muted text-[length:var(--t-xs)]">단위: tCO₂e</span>
             </div>
             <div className="card-b">
               {chartTab === "sankey" ? (

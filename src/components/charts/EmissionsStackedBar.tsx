@@ -71,7 +71,7 @@ export default function EmissionsStackedBar({
           iconType="square"
           iconSize={8}
           formatter={(key: string) => (
-            <span style={{ fontSize: 11, color: "var(--fg-3)" }}>{getScopeLabel(key)}</span>
+            <span className="text-[11px] text-[color:var(--fg-3)]">{getScopeLabel(key)}</span>
           )}
         />
         {SCOPES.map(({ key, color, radius }) => (

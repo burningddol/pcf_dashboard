@@ -33,7 +33,7 @@ export default function KpiSection({ activities }: KpiSectionProps) {
   const topSource = aggregateBySource(activities)[0];
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
+    <div className="grid grid-cols-5 gap-3">
       <KpiCard label="총 배출량" value={total.toFixed(2)} unit="tCO₂e" />
       <KpiCard label="Scope 1 직접배출" value={scope1.toFixed(2)} unit="tCO₂e" />
       <KpiCard label="Scope 2 구매전력" value={scope2.toFixed(2)} unit="tCO₂e" />

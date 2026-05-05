@@ -168,17 +168,8 @@ export default function EmissionsSankey({ data }: EmissionsSankeyProps): React.R
 
   if (!graph || graph.nodes.length === 0) {
     return (
-      <div
-        style={{
-          height: VIEW_H,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <p className="muted" style={{ fontSize: "var(--t-sm)" }}>
-          데이터 없음
-        </p>
+      <div className="flex items-center justify-center h-[300px]">
+        <p className="muted text-[length:var(--t-sm)]">데이터 없음</p>
       </div>
     );
   }
@@ -189,7 +180,7 @@ export default function EmissionsSankey({ data }: EmissionsSankeyProps): React.R
   return (
     <svg
       viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-      style={{ width: "100%", height: "auto" }}
+      className="w-full h-auto"
       role="img"
       aria-label="PCF Sankey 차트"
     >
