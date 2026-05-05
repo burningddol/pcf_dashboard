@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { aggregateByMonth, aggregateBySource } from "@/lib/domain/aggregate";
+import { aggregateByMonth, aggregateBySource, aggregateForSankey } from "@/lib/domain/aggregate";
 import type { Activity } from "@/types";
 
 const ACTIVITIES: Activity[] = [
@@ -75,5 +75,34 @@ describe("aggregateBySource", () => {
 
   it("빈 배열이면 빈 배열을 반환한다", () => {
     expect(aggregateBySource([])).toEqual([]);
+  });
+});
+
+describe("aggregateForSankey", () => {
+  it("활동 유형 → 생애주기 단계 노드와 링크를 생성한다", () => {
+    const result = aggregateForSankey(ACTIVITIES);
+    const stageNode = result.nodes.find((n) => n.id === "제조");
+    const activityNode = result.nodes.find((n) => n.id === "electricity");
+    expect(stageNode).toBeDefined();
+    expect(activityNode?.kind).toBe("activity");
+    expect(stageNode?.kind).toBe("stage");
+  });
+
+  it("total은 모든 활동의 tCO2e 합계다", () => {
+    const result = aggregateForSankey(ACTIVITIES);
+    expect(result.total).toBeCloseTo(0.46 + 1.75 + 0.91);
+  });
+
+  it("같은 생애주기 단계의 활동이 합산된다", () => {
+    const result = aggregateForSankey(ACTIVITIES);
+    const stageLink = result.links.find((l) => l.source === "제조" && l.target === "total");
+    expect(stageLink?.value).toBeCloseTo(0.46 + 0.91);
+  });
+
+  it("빈 배열이면 빈 노드/링크를 반환한다", () => {
+    const result = aggregateForSankey([]);
+    expect(result.nodes).toHaveLength(0);
+    expect(result.links).toHaveLength(0);
+    expect(result.total).toBe(0);
   });
 });

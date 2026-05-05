@@ -1,13 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { useFilterStore } from "@/stores/filter";
-import { aggregateByMonth } from "@/lib/domain/aggregate";
+import { aggregateByMonth, aggregateForSankey } from "@/lib/domain/aggregate";
 import FilterBar from "@/components/dashboard/FilterBar";
 import KpiSection from "@/components/dashboard/KpiSection";
 import EmissionsStackedBar from "@/components/charts/EmissionsStackedBar";
+import EmissionsSankey from "@/components/charts/EmissionsSankey";
 import type { Activity } from "@/types";
+
+type ChartTab = "sankey" | "bar";
 
 const KPI_SKELETON_COUNT = 5;
 const CHART_BAR_HEIGHTS = [60, 80, 55, 90, 70, 85, 65, 95, 75, 88, 60, 78];
@@ -39,8 +43,42 @@ function ChartSkeleton() {
   );
 }
 
+const TAB_STYLE_BASE: React.CSSProperties = {
+  fontSize: "var(--t-xs)",
+  fontWeight: 500,
+  padding: "4px 12px",
+  borderRadius: "var(--r-2)",
+  border: "none",
+  cursor: "pointer",
+  transition: "background 0.15s, color 0.15s",
+};
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        ...TAB_STYLE_BASE,
+        background: active ? "var(--fg)" : "transparent",
+        color: active ? "var(--bg)" : "var(--fg-3)",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function OverviewPage() {
   const { filter } = useFilterStore();
+  const [chartTab, setChartTab] = useState<ChartTab>("sankey");
   const {
     data: activities,
     isLoading,
@@ -81,15 +119,24 @@ export default function OverviewPage() {
           <KpiSection activities={activities ?? []} />
           <div className="card">
             <div className="card-h">
-              <p style={{ fontSize: "var(--t-sm)", fontWeight: 500, color: "var(--fg-2)" }}>
-                월별 배출량
-              </p>
+              <div className="row" style={{ gap: 4 }}>
+                <TabButton active={chartTab === "sankey"} onClick={() => setChartTab("sankey")}>
+                  PCF Sankey
+                </TabButton>
+                <TabButton active={chartTab === "bar"} onClick={() => setChartTab("bar")}>
+                  월별 배출량
+                </TabButton>
+              </div>
               <span className="muted" style={{ fontSize: "var(--t-xs)" }}>
                 단위: tCO₂e
               </span>
             </div>
             <div className="card-b">
-              <EmissionsStackedBar data={aggregateByMonth(activities ?? [])} />
+              {chartTab === "sankey" ? (
+                <EmissionsSankey data={aggregateForSankey(activities ?? [])} />
+              ) : (
+                <EmissionsStackedBar data={aggregateByMonth(activities ?? [])} />
+              )}
             </div>
           </div>
         </>
