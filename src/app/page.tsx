@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import useSWR from "swr";
+import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { useFilterStore } from "@/stores/filter";
 import { aggregateByMonth, aggregateForSankey } from "@/lib/domain/aggregate";
@@ -79,11 +79,15 @@ function TabButton({
 export default function OverviewPage() {
   const { filter } = useFilterStore();
   const [chartTab, setChartTab] = useState<ChartTab>("sankey");
+
   const {
     data: activities,
     isLoading,
     error,
-  } = useSWR<Activity[]>(`/api/activities?from=${filter.from}&to=${filter.to}`, fetcher);
+  } = useQuery<Activity[]>({
+    queryKey: ["activities", filter.from, filter.to],
+    queryFn: () => fetcher<Activity[]>(`/api/activities?from=${filter.from}&to=${filter.to}`),
+  });
 
   return (
     <div className="col" style={{ padding: 32, gap: 24 }}>

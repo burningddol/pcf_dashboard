@@ -123,7 +123,7 @@ async function main(): Promise<void> {
   });
 
   await Promise.all(
-    factors.map((f) => prisma.emissionFactor.upsert({ where: { id: f.id }, update: {}, create: f }))
+    factors.map((f) => prisma.emissionFactor.upsert({ where: { id: f.id }, update: f, create: f }))
   );
 
   await prisma.activity.deleteMany({ where: { companyId: company.id } });

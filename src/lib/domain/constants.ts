@@ -31,3 +31,9 @@ export const SCOPE_LABEL: Record<Scope, string> = {
   scope2: "Scope 2",
   scope3: "Scope 3",
 };
+
+export const SCOPE_BADGE_BG: Record<Scope, string> = {
+  scope1: "var(--scope-1-soft, #e8f4f1)",
+  scope2: "var(--scope-2-soft, #e8f0f8)",
+  scope3: "var(--scope-3-soft, #f0f4e8)",
+};
