@@ -3,8 +3,7 @@
 import { useMemo } from "react";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import type { SankeyNode, SankeyLink } from "d3-sankey";
-import { ACTIVITY_LABELS, LIFECYCLE_COLORS, LIFECYCLE_STAGE_LABEL } from "@/lib/domain/constants";
-import type { LifecycleStage } from "@/lib/domain/constants";
+import { CATEGORY_COLOR } from "@/lib/domain/constants";
 import type { SankeyInput, SankeyNodeDatum, SankeyLinkDatum } from "@/lib/domain/aggregate";
 import type { ActivityType } from "@/types";
 
@@ -20,8 +19,8 @@ type LayoutLink = SankeyLink<SankeyNodeDatum, SankeyLinkDatum>;
 
 function resolveNodeColor(node: LayoutNode): string {
   if (node.kind === "activity") return "var(--fg-4)";
-  if (node.kind === "total") return "var(--fg-2)";
-  return LIFECYCLE_COLORS[node.id as LifecycleStage] ?? "var(--fg-3)";
+  if (node.kind === "category") return CATEGORY_COLOR[node.label as ActivityType] ?? "var(--fg-3)";
+  return "var(--fg-2)";
 }
 
 function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | null {
@@ -33,6 +32,21 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
   const height = y1 - y0;
 
   switch (node.kind) {
+    case "category":
+      if (height <= 20) return null;
+      return (
+        <text
+          x={(x0 + x1) / 2}
+          y={midY}
+          textAnchor="middle"
+          fontSize={9}
+          fill="white"
+          dominantBaseline="middle"
+          fontWeight={500}
+        >
+          {node.label}
+        </text>
+      );
     case "activity":
       return (
         <>
@@ -44,7 +58,7 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
             fill="var(--fg-2)"
             dominantBaseline="middle"
           >
-            {ACTIVITY_LABELS[node.id as ActivityType] ?? node.label}
+            {node.label}
           </text>
           <text
             x={x0 - 8}
@@ -56,35 +70,6 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
             fontFamily="var(--font-mono)"
           >
             {(node.value ?? 0).toFixed(2)} t
-          </text>
-        </>
-      );
-    case "stage":
-      if (height <= 28) return null;
-      return (
-        <>
-          <text
-            x={(x0 + x1) / 2}
-            y={midY - 7}
-            textAnchor="middle"
-            fontSize={11}
-            fontWeight={600}
-            fill="white"
-            dominantBaseline="middle"
-          >
-            {LIFECYCLE_STAGE_LABEL[node.id as LifecycleStage] ?? node.id}
-          </text>
-          <text
-            x={(x0 + x1) / 2}
-            y={midY + 7}
-            textAnchor="middle"
-            fontSize={10}
-            fill="rgba(255,255,255,0.75)"
-            dominantBaseline="middle"
-            fontFamily="var(--font-mono)"
-          >
-            {(node.value ?? 0).toFixed(1)} t ·{" "}
-            {total > 0 ? (((node.value ?? 0) / total) * 100).toFixed(0) : 0}%
           </text>
         </>
       );
@@ -122,6 +107,8 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
           </text>
         </>
       );
+    default:
+      return null;
   }
 }
 

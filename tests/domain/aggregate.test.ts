@@ -6,7 +6,8 @@ const ACTIVITIES: Activity[] = [
   {
     id: "1",
     companyId: "c1",
-    activityType: "electricity",
+    activityType: "전기",
+    description: "한국전력",
     yearMonth: "2025-01",
     amount: 1000,
     unit: "kWh",
@@ -18,10 +19,11 @@ const ACTIVITIES: Activity[] = [
   {
     id: "2",
     companyId: "c1",
-    activityType: "transport",
+    activityType: "운송",
+    description: "트럭",
     yearMonth: "2025-01",
     amount: 500,
-    unit: "km",
+    unit: "ton-km",
     factorId: "f2",
     tCO2e: 1.75,
     scope: "scope3",
@@ -30,7 +32,8 @@ const ACTIVITIES: Activity[] = [
   {
     id: "3",
     companyId: "c1",
-    activityType: "electricity",
+    activityType: "전기",
+    description: "한국전력",
     yearMonth: "2025-02",
     amount: 2000,
     unit: "kWh",
@@ -67,9 +70,9 @@ describe("aggregateByMonth", () => {
 describe("aggregateBySource", () => {
   it("활동 유형별 tCO2e 합계를 내림차순으로 반환한다", () => {
     const result = aggregateBySource(ACTIVITIES);
-    expect(result[0].activityType).toBe("transport");
+    expect(result[0].activityType).toBe("운송");
     expect(result[0].tCO2e).toBe(1.75);
-    expect(result[1].activityType).toBe("electricity");
+    expect(result[1].activityType).toBe("전기");
     expect(result[1].tCO2e).toBeCloseTo(1.37);
   });
 
@@ -79,13 +82,11 @@ describe("aggregateBySource", () => {
 });
 
 describe("aggregateForSankey", () => {
-  it("활동 유형 → 생애주기 단계 노드와 링크를 생성한다", () => {
+  it("3단계 노드(설명→활동유형→total)를 생성한다", () => {
     const result = aggregateForSankey(ACTIVITIES);
-    const stageNode = result.nodes.find((n) => n.id === "제조");
-    const activityNode = result.nodes.find((n) => n.id === "electricity");
-    expect(stageNode).toBeDefined();
-    expect(activityNode?.kind).toBe("activity");
-    expect(stageNode?.kind).toBe("stage");
+    expect(result.nodes.find((n) => n.id === "한국전력")?.kind).toBe("activity");
+    expect(result.nodes.find((n) => n.id === "전기")?.kind).toBe("category");
+    expect(result.nodes.find((n) => n.id === "total")?.kind).toBe("total");
   });
 
   it("total은 모든 활동의 tCO2e 합계다", () => {
@@ -93,10 +94,10 @@ describe("aggregateForSankey", () => {
     expect(result.total).toBeCloseTo(0.46 + 1.75 + 0.91);
   });
 
-  it("같은 생애주기 단계의 활동이 합산된다", () => {
+  it("설명 → 활동유형 → total 링크가 존재한다", () => {
     const result = aggregateForSankey(ACTIVITIES);
-    const stageLink = result.links.find((l) => l.source === "제조" && l.target === "total");
-    expect(stageLink?.value).toBeCloseTo(0.46 + 0.91);
+    expect(result.links.find((l) => l.source === "한국전력" && l.target === "전기")).toBeDefined();
+    expect(result.links.find((l) => l.source === "전기" && l.target === "total")?.value).toBeCloseTo(0.46 + 0.91);
   });
 
   it("빈 배열이면 빈 노드/링크를 반환한다", () => {

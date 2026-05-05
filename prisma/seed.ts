@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import type { ActivityType, Scope } from "../src/types";
+import type { Scope } from "../src/types";
 
 config();
 
@@ -15,7 +15,7 @@ const company = { id: "ct-045", name: "CT-045 제조사", country: "KR" };
 const factors = [
   {
     id: "ef-electricity-v1",
-    activityType: "electricity" as ActivityType,
+    activityType: "전기",
     value: 0.456,
     unit: "kgCO₂e/kWh",
     version: 1,
@@ -24,7 +24,7 @@ const factors = [
   },
   {
     id: "ef-plastic1-v1",
-    activityType: "plastic1" as ActivityType,
+    activityType: "원소재",
     value: 2.3,
     unit: "kgCO₂e/kg",
     version: 1,
@@ -33,7 +33,7 @@ const factors = [
   },
   {
     id: "ef-plastic1-v0",
-    activityType: "plastic1" as ActivityType,
+    activityType: "원소재",
     value: 2.1,
     unit: "kgCO₂e/kg",
     version: 0,
@@ -42,7 +42,7 @@ const factors = [
   },
   {
     id: "ef-plastic2-v1",
-    activityType: "plastic2" as ActivityType,
+    activityType: "원소재",
     value: 3.2,
     unit: "kgCO₂e/kg",
     version: 1,
@@ -51,7 +51,7 @@ const factors = [
   },
   {
     id: "ef-transport-v1",
-    activityType: "transport" as ActivityType,
+    activityType: "운송",
     value: 3.5,
     unit: "kgCO₂e/ton-km",
     version: 1,
@@ -70,7 +70,8 @@ function toTCO2e(amount: number, factorId: string): number {
 
 type RawEntry = {
   yearMonth: string;
-  activityType: ActivityType;
+  activityType: string;
+  description: string;
   amount: number;
   unit: string;
   factorId: string;
@@ -79,249 +80,39 @@ type RawEntry = {
 
 const activities: RawEntry[] = [
   // 전기 (Scope 2)
-  {
-    yearMonth: "2025-01",
-    activityType: "electricity",
-    amount: 110,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
-  {
-    yearMonth: "2025-02",
-    activityType: "electricity",
-    amount: 112,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
-  {
-    yearMonth: "2025-03",
-    activityType: "electricity",
-    amount: 115,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
-  {
-    yearMonth: "2025-04",
-    activityType: "electricity",
-    amount: 130,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
-  {
-    yearMonth: "2025-05",
-    activityType: "electricity",
-    amount: 120,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
-  {
-    yearMonth: "2025-05",
-    activityType: "electricity",
-    amount: 101,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
-  {
-    yearMonth: "2025-06",
-    activityType: "electricity",
-    amount: 110,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
-  {
-    yearMonth: "2025-07",
-    activityType: "electricity",
-    amount: 120,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
-  {
-    yearMonth: "2025-08",
-    activityType: "electricity",
-    amount: 111,
-    unit: "kWh",
-    factorId: "ef-electricity-v1",
-    scope: "scope2",
-  },
+  { yearMonth: "2025-01", activityType: "전기", description: "한국전력", amount: 110, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
+  { yearMonth: "2025-02", activityType: "전기", description: "한국전력", amount: 112, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
+  { yearMonth: "2025-03", activityType: "전기", description: "한국전력", amount: 115, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
+  { yearMonth: "2025-04", activityType: "전기", description: "한국전력", amount: 130, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
+  { yearMonth: "2025-05", activityType: "전기", description: "한국전력", amount: 120, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
+  { yearMonth: "2025-05", activityType: "전기", description: "한국전력", amount: 101, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
+  { yearMonth: "2025-06", activityType: "전기", description: "한국전력", amount: 110, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
+  { yearMonth: "2025-07", activityType: "전기", description: "한국전력", amount: 120, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
+  { yearMonth: "2025-08", activityType: "전기", description: "한국전력", amount: 111, unit: "kWh", factorId: "ef-electricity-v1", scope: "scope2" },
   // 원소재 — 플라스틱 1 (Scope 3)
-  {
-    yearMonth: "2025-01",
-    activityType: "plastic1",
-    amount: 230,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-02",
-    activityType: "plastic1",
-    amount: 340,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-03",
-    activityType: "plastic1",
-    amount: 430,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-04",
-    activityType: "plastic1",
-    amount: 510,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-05",
-    activityType: "plastic1",
-    amount: 424,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-05",
-    activityType: "plastic1",
-    amount: 232,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-06",
-    activityType: "plastic1",
-    amount: 450,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-07",
-    activityType: "plastic1",
-    amount: 340,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-08",
-    activityType: "plastic1",
-    amount: 230,
-    unit: "kg",
-    factorId: "ef-plastic1-v1",
-    scope: "scope3",
-  },
+  { yearMonth: "2025-01", activityType: "원소재", description: "플라스틱 1", amount: 230, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
+  { yearMonth: "2025-02", activityType: "원소재", description: "플라스틱 1", amount: 340, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
+  { yearMonth: "2025-03", activityType: "원소재", description: "플라스틱 1", amount: 430, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
+  { yearMonth: "2025-04", activityType: "원소재", description: "플라스틱 1", amount: 510, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
+  { yearMonth: "2025-05", activityType: "원소재", description: "플라스틱 1", amount: 424, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
+  { yearMonth: "2025-05", activityType: "원소재", description: "플라스틱 1", amount: 232, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
+  { yearMonth: "2025-06", activityType: "원소재", description: "플라스틱 1", amount: 450, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
+  { yearMonth: "2025-07", activityType: "원소재", description: "플라스틱 1", amount: 340, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
+  { yearMonth: "2025-08", activityType: "원소재", description: "플라스틱 1", amount: 230, unit: "kg", factorId: "ef-plastic1-v1", scope: "scope3" },
   // 원소재 — 플라스틱 2 (Scope 3)
-  {
-    yearMonth: "2025-03",
-    activityType: "plastic2",
-    amount: 23,
-    unit: "kg",
-    factorId: "ef-plastic2-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-05",
-    activityType: "plastic2",
-    amount: 40,
-    unit: "kg",
-    factorId: "ef-plastic2-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-07",
-    activityType: "plastic2",
-    amount: 43,
-    unit: "kg",
-    factorId: "ef-plastic2-v1",
-    scope: "scope3",
-  },
+  { yearMonth: "2025-03", activityType: "원소재", description: "플라스틱 2", amount: 23, unit: "kg", factorId: "ef-plastic2-v1", scope: "scope3" },
+  { yearMonth: "2025-05", activityType: "원소재", description: "플라스틱 2", amount: 40, unit: "kg", factorId: "ef-plastic2-v1", scope: "scope3" },
+  { yearMonth: "2025-07", activityType: "원소재", description: "플라스틱 2", amount: 43, unit: "kg", factorId: "ef-plastic2-v1", scope: "scope3" },
   // 운송 — 트럭 (Scope 3)
-  {
-    yearMonth: "2025-01",
-    activityType: "transport",
-    amount: 41,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-02",
-    activityType: "transport",
-    amount: 211,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-03",
-    activityType: "transport",
-    amount: 123,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-04",
-    activityType: "transport",
-    amount: 42,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-05",
-    activityType: "transport",
-    amount: 123,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-05",
-    activityType: "transport",
-    amount: 12,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-06",
-    activityType: "transport",
-    amount: 123,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-07",
-    activityType: "transport",
-    amount: 41,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
-  {
-    yearMonth: "2025-08",
-    activityType: "transport",
-    amount: 123,
-    unit: "ton-km",
-    factorId: "ef-transport-v1",
-    scope: "scope3",
-  },
+  { yearMonth: "2025-01", activityType: "운송", description: "트럭", amount: 41, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
+  { yearMonth: "2025-02", activityType: "운송", description: "트럭", amount: 211, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
+  { yearMonth: "2025-03", activityType: "운송", description: "트럭", amount: 123, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
+  { yearMonth: "2025-04", activityType: "운송", description: "트럭", amount: 42, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
+  { yearMonth: "2025-05", activityType: "운송", description: "트럭", amount: 123, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
+  { yearMonth: "2025-05", activityType: "운송", description: "트럭", amount: 12, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
+  { yearMonth: "2025-06", activityType: "운송", description: "트럭", amount: 123, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
+  { yearMonth: "2025-07", activityType: "운송", description: "트럭", amount: 41, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
+  { yearMonth: "2025-08", activityType: "운송", description: "트럭", amount: 123, unit: "ton-km", factorId: "ef-transport-v1", scope: "scope3" },
 ];
 
 async function main(): Promise<void> {
@@ -342,6 +133,7 @@ async function main(): Promise<void> {
       companyId: company.id,
       factorId: a.factorId,
       activityType: a.activityType,
+      description: a.description,
       yearMonth: a.yearMonth,
       amount: a.amount,
       unit: a.unit,

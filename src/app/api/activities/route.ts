@@ -23,9 +23,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const body = await req.json();
-  const { companyId, activityType, yearMonth, amount, unit, factorId, scope } = body as {
+  const { companyId, activityType, description, yearMonth, amount, unit, factorId, scope } = body as {
     companyId: string;
     activityType: ActivityType;
+    description: string;
     yearMonth: string;
     amount: number;
     unit: string;
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const tCO2e = computeTCO2e(amount, factor.value);
 
   const activity = await prisma.activity.create({
-    data: { companyId, activityType, yearMonth, amount, unit, factorId, tCO2e, scope },
+    data: { companyId, activityType, description, yearMonth, amount, unit, factorId, tCO2e, scope },
   });
 
   return NextResponse.json(activity, { status: 201 });

@@ -1,4 +1,4 @@
-export type ActivityType = "electricity" | "plastic1" | "plastic2" | "transport";
+export type ActivityType = "전기" | "원소재" | "운송";
 export type Scope = "scope1" | "scope2" | "scope3";
 
 export interface Company {
@@ -9,11 +9,11 @@ export interface Company {
 
 export interface EmissionFactor {
   id: string;
-  activityType: ActivityType;
-  value: number; // kgCO₂e per unit
+  activityType: string;
+  value: number;
   unit: string;
   version: number;
-  validFrom: string; // YYYY-MM
+  validFrom: string;
   source: string;
 }
 
@@ -21,7 +21,8 @@ export interface Activity {
   id: string;
   companyId: string;
   activityType: ActivityType;
-  yearMonth: string; // YYYY-MM
+  description: string;
+  yearMonth: string;
   amount: number;
   unit: string;
   factorId: string;
@@ -31,6 +32,6 @@ export interface Activity {
 }
 
 export interface FilterState {
-  from: string; // YYYY-MM
-  to: string; // YYYY-MM
+  from: string;
+  to: string;
 }

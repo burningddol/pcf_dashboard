@@ -1,6 +1,4 @@
 import type { Activity, ActivityType } from "@/types";
-import { ACTIVITY_LABELS, LIFECYCLE_STAGE } from "./constants";
-import type { LifecycleStage } from "./constants";
 
 export interface MonthlyRow {
   yearMonth: string;
@@ -45,7 +43,7 @@ export function aggregateBySource(activities: Activity[]): SourceSummary[] {
 export interface SankeyNodeDatum {
   id: string;
   label: string;
-  kind: "activity" | "stage" | "total";
+  kind: "activity" | "category" | "total";
 }
 
 export interface SankeyLinkDatum {
@@ -63,39 +61,40 @@ export interface SankeyInput {
 export function aggregateForSankey(activities: Activity[]): SankeyInput {
   if (activities.length === 0) return { nodes: [], links: [], total: 0 };
 
-  const activityTotals = new Map<ActivityType, number>();
-  const stageTotals = new Map<LifecycleStage, number>();
+  const descriptionTotals = new Map<string, number>();
+  const activityTypeTotals = new Map<string, number>();
+  const descriptionToType = new Map<string, string>();
 
   for (const a of activities) {
-    activityTotals.set(a.activityType, (activityTotals.get(a.activityType) ?? 0) + a.tCO2e);
-    const stage = LIFECYCLE_STAGE[a.activityType];
-    stageTotals.set(stage, (stageTotals.get(stage) ?? 0) + a.tCO2e);
+    descriptionTotals.set(a.description, (descriptionTotals.get(a.description) ?? 0) + a.tCO2e);
+    activityTypeTotals.set(a.activityType, (activityTypeTotals.get(a.activityType) ?? 0) + a.tCO2e);
+    descriptionToType.set(a.description, a.activityType);
   }
 
-  const total = Array.from(stageTotals.values()).reduce((s, v) => s + v, 0);
+  const total = Array.from(activityTypeTotals.values()).reduce((s, v) => s + v, 0);
 
   const nodes: SankeyNodeDatum[] = [
-    ...Array.from(activityTotals.keys()).map((type) => ({
-      id: type,
-      label: ACTIVITY_LABELS[type],
+    ...Array.from(descriptionTotals.keys()).map((desc) => ({
+      id: desc,
+      label: desc,
       kind: "activity" as const,
     })),
-    ...Array.from(stageTotals.keys()).map((stage) => ({
-      id: stage,
-      label: stage,
-      kind: "stage" as const,
+    ...Array.from(activityTypeTotals.keys()).map((type) => ({
+      id: type,
+      label: type,
+      kind: "category" as const,
     })),
     { id: "total", label: "Total PCF", kind: "total" as const },
   ];
 
   const links: SankeyLinkDatum[] = [
-    ...Array.from(activityTotals.entries()).map(([type, value]) => ({
-      source: type,
-      target: LIFECYCLE_STAGE[type],
+    ...Array.from(descriptionTotals.entries()).map(([desc, value]) => ({
+      source: desc,
+      target: descriptionToType.get(desc)!,
       value,
     })),
-    ...Array.from(stageTotals.entries()).map(([stage, value]) => ({
-      source: stage,
+    ...Array.from(activityTypeTotals.entries()).map(([type, value]) => ({
+      source: type,
       target: "total",
       value,
     })),

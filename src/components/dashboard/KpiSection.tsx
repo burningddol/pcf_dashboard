@@ -2,7 +2,6 @@
 
 import KpiCard from "@/components/ui/KpiCard";
 import { aggregateBySource } from "@/lib/domain/aggregate";
-import { ACTIVITY_LABELS } from "@/lib/domain/constants";
 import type { Activity } from "@/types";
 
 interface KpiSectionProps {
@@ -41,7 +40,7 @@ export default function KpiSection({ activities }: KpiSectionProps) {
       <KpiCard label="Scope 3 가치사슬" value={scope3.toFixed(2)} unit="tCO₂e" />
       <KpiCard
         label="최대 배출원"
-        value={topSource ? ACTIVITY_LABELS[topSource.activityType] : "-"}
+        value={topSource ? topSource.activityType : "-"}
         unit=""
         sub={topSource ? `${topSource.tCO2e.toFixed(2)} tCO₂e` : undefined}
       />
