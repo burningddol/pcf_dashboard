@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import ActivityTable from "@/components/activity/ActivityTable";
 import ActivityForm from "@/components/activity/ActivityForm";
+import ExcelImport from "@/components/activity/ExcelImport";
 import type { Activity, EmissionFactor } from "@/types";
 
 export default function ActivitiesPage() {
@@ -18,8 +19,11 @@ export default function ActivitiesPage() {
   });
 
   return (
-    <div className="col" style={{ padding: 32, gap: 24 }}>
-      <h1 style={{ fontSize: "var(--t-h2)", fontWeight: 600, color: "var(--fg)" }}>활동 데이터</h1>
+    <div className="flex flex-col p-8 gap-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-[var(--t-h2)] font-semibold text-[color:var(--fg)]">활동 데이터</h1>
+        <ExcelImport />
+      </div>
       <ActivityForm factors={factors ?? []} />
       <ActivityTable activities={activities ?? []} isLoading={isLoading} />
     </div>
