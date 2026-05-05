@@ -19,7 +19,7 @@ type LayoutLink = SankeyLink<SankeyNodeDatum, SankeyLinkDatum>;
 
 function resolveNodeColor(node: LayoutNode): string {
   if (node.kind === "activity") return "var(--fg-4)";
-  if (node.kind === "category") return CATEGORY_COLOR[node.label as ActivityType] ?? "var(--fg-3)";
+  if (node.kind === "category") return CATEGORY_COLOR[node.id as ActivityType] ?? "var(--fg-3)";
   if (node.kind === "scope") return SCOPE_COLOR[node.id as Scope] ?? "var(--fg-3)";
   return "var(--fg-2)";
 }
