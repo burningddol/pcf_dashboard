@@ -47,7 +47,10 @@ function TableBody({ activities, isLoading }: ActivityTableProps) {
   if (sorted.length === 0) {
     return (
       <tr>
-        <td colSpan={HEADERS.length} className="px-3 py-8 text-center text-[12px] text-[color:var(--fg-4)]">
+        <td
+          colSpan={HEADERS.length}
+          className="px-3 py-8 text-center text-[12px] text-[color:var(--fg-4)]"
+        >
           데이터 없음
         </td>
       </tr>
@@ -59,9 +62,13 @@ function TableBody({ activities, isLoading }: ActivityTableProps) {
       <td className={cellClass + " num"}>{a.yearMonth}</td>
       <td className={cellClass}>{a.activityType}</td>
       <td className={cellClass}>{a.description}</td>
-      <td className={cellClass + " font-mono"}>{a.amount.toLocaleString()} {a.unit}</td>
+      <td className={cellClass + " font-mono"}>
+        {a.amount.toLocaleString()} {a.unit}
+      </td>
       <td className={cellClass + " font-mono font-semibold"}>{a.tCO2e.toFixed(2)}</td>
-      <td className={cellClass}><ScopeBadge scope={a.scope} /></td>
+      <td className={cellClass}>
+        <ScopeBadge scope={a.scope} />
+      </td>
     </tr>
   ));
 }
@@ -78,7 +85,10 @@ export default memo(function ActivityTable({ activities, isLoading }: ActivityTa
           <thead>
             <tr className="border-b border-[color:var(--line)]">
               {HEADERS.map((h) => (
-                <th key={h} className="px-3 py-2 text-left text-[11px] font-medium text-[color:var(--fg-3)]">
+                <th
+                  key={h}
+                  className="px-3 py-2 text-left text-[11px] font-medium text-[color:var(--fg-3)]"
+                >
                   {h}
                 </th>
               ))}

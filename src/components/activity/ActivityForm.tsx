@@ -25,9 +25,7 @@ interface FormValues {
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return (
-    <span className="text-[11px] font-medium text-[color:var(--neg)]">{message}</span>
-  );
+  return <span className="text-[11px] font-medium text-[color:var(--neg)]">{message}</span>;
 }
 
 export default function ActivityForm({ factors }: ActivityFormProps) {
@@ -40,7 +38,13 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
     setValue,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: { activityType: "전기", factorId: "", description: "", yearMonth: "", amount: "" },
+    defaultValues: {
+      activityType: "전기",
+      factorId: "",
+      description: "",
+      yearMonth: "",
+      amount: "",
+    },
   });
 
   const { activityType, factorId, amount } = watch();
@@ -102,7 +106,9 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
             className={inputClass}
           >
             {ACTIVITY_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
           </select>
         </label>
