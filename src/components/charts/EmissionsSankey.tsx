@@ -34,14 +34,14 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
 
   switch (node.kind) {
     case "category":
-      if (height <= 20) return null;
+      if (height <= 12) return null;
       return (
         <text
           x={(x0 + x1) / 2}
           y={midY}
           textAnchor="middle"
           fontSize={9}
-          fill="white"
+          fill="black"
           dominantBaseline="middle"
           fontWeight={500}
         >
@@ -75,31 +75,33 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
         </>
       );
     case "scope":
-      if (height <= 28) return null;
+      if (height <= 12) return null;
       return (
         <>
           <text
             x={(x0 + x1) / 2}
-            y={midY - 7}
+            y={height > 24 ? midY - 7 : midY}
             textAnchor="middle"
             fontSize={10}
             fontWeight={600}
-            fill="white"
+            fill="black"
             dominantBaseline="middle"
           >
             {node.label}
           </text>
-          <text
-            x={(x0 + x1) / 2}
-            y={midY + 7}
-            textAnchor="middle"
-            fontSize={9}
-            fill="rgba(255,255,255,0.8)"
-            dominantBaseline="middle"
-            fontFamily="var(--font-mono)"
-          >
-            {total > 0 ? (((node.value ?? 0) / total) * 100).toFixed(0) : 0}%
-          </text>
+          {height > 24 && (
+            <text
+              x={(x0 + x1) / 2}
+              y={midY + 7}
+              textAnchor="middle"
+              fontSize={9}
+              fill="rgba(0,0,0,0.6)"
+              dominantBaseline="middle"
+              fontFamily="var(--font-mono)"
+            >
+              {total > 0 ? (((node.value ?? 0) / total) * 100).toFixed(0) : 0}%
+            </text>
+          )}
         </>
       );
     case "total":
