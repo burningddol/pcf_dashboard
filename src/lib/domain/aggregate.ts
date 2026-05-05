@@ -78,11 +78,13 @@ export function aggregateForSankey(activities: Activity[]): SankeyInput {
   const total = Array.from(scopeTotals.values()).reduce((s, v) => s + v, 0);
 
   const nodes: SankeyNodeDatum[] = [
-    ...Array.from(descriptionTotals.keys()).map((desc) => ({
-      id: desc,
-      label: desc,
-      kind: "activity" as const,
-    })),
+    ...Array.from(descriptionTotals.keys())
+      .sort()
+      .map((desc) => ({
+        id: desc,
+        label: desc,
+        kind: "activity" as const,
+      })),
     ...Array.from(activityTypeTotals.keys()).map((type) => ({
       id: type,
       label: type,

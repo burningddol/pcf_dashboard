@@ -153,6 +153,7 @@ export default function EmissionsSankey({ data }: EmissionsSankeyProps): React.R
 
     const gen = sankey<SankeyNodeDatum, SankeyLinkDatum>()
       .nodeId((d) => d.id)
+      .nodeSort(null)
       .nodeWidth(NODE_W)
       .nodePadding(NODE_PAD)
       .extent([
