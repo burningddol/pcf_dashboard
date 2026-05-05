@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/lib/cn";
 import { computeTCO2e } from "@/lib/domain/pcf";
 import { mapToScope } from "@/lib/domain/scope";
 import type { Activity, ActivityType, CreateActivityBody, EmissionFactor } from "@/types";
@@ -22,6 +23,13 @@ interface FormValues {
   amount: string;
 }
 
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <span className="text-[11px] font-medium text-[color:var(--neg)]">{message}</span>
+  );
+}
+
 export default function ActivityForm({ factors }: ActivityFormProps) {
   const queryClient = useQueryClient();
   const {
@@ -35,9 +43,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
     defaultValues: { activityType: "전기", factorId: "", description: "", yearMonth: "", amount: "" },
   });
 
-  const activityType = watch("activityType");
-  const factorId = watch("factorId");
-  const amount = watch("amount");
+  const { activityType, factorId, amount } = watch();
 
   const filteredFactors = useMemo(
     () => factors.filter((f) => f.activityType === activityType),
@@ -66,7 +72,6 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
   });
 
   function onSubmit(values: FormValues): void {
-    if (!selectedFactor) return;
     mutation.mutate({
       companyId: COMPANY_ID,
       activityType: values.activityType,
@@ -80,13 +85,13 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="card" style={{ padding: 20 }}>
-      <div className="card-h" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--fg)" }}>새 활동 추가</p>
+    <form onSubmit={handleSubmit(onSubmit)} className="card p-5">
+      <div className="card-h mb-4">
+        <p className="text-[12px] font-semibold text-[color:var(--fg)]">새 활동 추가</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-        <label className="col" style={{ gap: 6 }}>
+      <div className="grid grid-cols-3 gap-3">
+        <label className="flex flex-col gap-1.5">
           <span className="micro">활동 유형</span>
           <select
             {...register("activityType")}
@@ -94,7 +99,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
               setValue("activityType", e.target.value as ActivityType);
               setValue("factorId", "");
             }}
-            style={inputStyle}
+            className={inputClass}
           >
             {ACTIVITY_TYPES.map((t) => (
               <option key={t} value={t}>{t}</option>
@@ -102,14 +107,11 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
           </select>
         </label>
 
-        <label className="col" style={{ gap: 6 }}>
+        <label className="flex flex-col gap-1.5">
           <span className="micro">배출계수</span>
           <select
             {...register("factorId", { required: "배출계수를 선택해주세요." })}
-            style={{
-              ...inputStyle,
-              ...(errors.factorId && { borderColor: "var(--neg)" }),
-            }}
+            className={cn(inputClass, errors.factorId && "border-[color:var(--neg)]")}
           >
             <option value="">선택</option>
             {filteredFactors.map((f) => (
@@ -118,76 +120,61 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
               </option>
             ))}
           </select>
-          {errors.factorId && (
-            <span style={{ fontSize: "var(--t-xs)", color: "var(--neg)", fontWeight: 500 }}>
-              {errors.factorId.message}
-            </span>
-          )}
+          <FieldError message={errors.factorId?.message} />
         </label>
 
-        <label className="col" style={{ gap: 6 }}>
+        <label className="flex flex-col gap-1.5">
           <span className="micro">설명</span>
           <input
-            {...register("description", { required: true })}
+            {...register("description", { required: "설명을 입력해주세요." })}
             type="text"
             placeholder="예: 플라스틱 1"
-            style={inputStyle}
+            className={cn(inputClass, errors.description && "border-[color:var(--neg)]")}
           />
+          <FieldError message={errors.description?.message} />
         </label>
 
-        <label className="col" style={{ gap: 6 }}>
+        <label className="flex flex-col gap-1.5">
           <span className="micro">기간</span>
           <input
-            {...register("yearMonth", { required: true, pattern: /^\d{4}-\d{2}$/ })}
+            {...register("yearMonth", {
+              required: "기간을 입력해주세요.",
+              pattern: { value: /^\d{4}-\d{2}$/, message: "YYYY-MM 형식으로 입력해주세요." },
+            })}
             type="text"
             placeholder="YYYY-MM"
-            style={inputStyle}
+            className={cn(inputClass, errors.yearMonth && "border-[color:var(--neg)]")}
           />
+          <FieldError message={errors.yearMonth?.message} />
         </label>
 
-        <label className="col" style={{ gap: 6 }}>
+        <label className="flex flex-col gap-1.5">
           <span className="micro">활동량{amountUnit && ` (${amountUnit})`}</span>
           <input
-            {...register("amount", { required: true, min: 0 })}
+            {...register("amount", { required: "활동량을 입력해주세요.", min: 0 })}
             type="number"
             placeholder="0"
             step="any"
-            style={inputStyle}
+            className={cn(inputClass, errors.amount && "border-[color:var(--neg)]")}
           />
+          <FieldError message={errors.amount?.message} />
         </label>
 
-        <div className="col" style={{ gap: 6 }}>
+        <div className="flex flex-col gap-1.5">
           <span className="micro">tCO₂e 예상</span>
-          <div className="row" style={{ gap: 8 }}>
+          <div className="flex items-center gap-2">
             <span
-              className="num"
-              style={{
-                flex: 1,
-                padding: "6px 10px",
-                background: "var(--bg-2)",
-                borderRadius: "var(--r-2)",
-                fontSize: "var(--t-sm)",
-                fontWeight: 600,
-                color: preview != null ? "var(--fg)" : "var(--fg-4)",
-              }}
+              className={cn(
+                "num flex-1 px-2.5 py-1.5 rounded-[var(--r-2)] text-[12px] font-semibold bg-[color:var(--bg-2)]",
+                preview != null ? "text-[color:var(--fg)]" : "text-[color:var(--fg-4)]"
+              )}
             >
               {preview != null ? `${preview.toFixed(3)} t` : "—"}
             </span>
             <button
               type="submit"
               disabled={mutation.isPending}
-              style={{
-                padding: "6px 16px",
-                background: "var(--fg)",
-                color: "var(--bg)",
-                border: "none",
-                borderRadius: "var(--r-2)",
-                fontSize: "var(--t-sm)",
-                fontWeight: 500,
-                cursor: mutation.isPending ? "not-allowed" : "pointer",
-                opacity: mutation.isPending ? 0.6 : 1,
-                whiteSpace: "nowrap",
-              }}
+              className="px-4 py-1.5 rounded-[var(--r-2)] text-[12px] font-medium whitespace-nowrap bg-[color:var(--fg)] text-[color:var(--bg)] border-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
             >
               {mutation.isPending ? "저장 중…" : "추가"}
             </button>
@@ -196,7 +183,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
       </div>
 
       {mutation.isError && (
-        <p style={{ marginTop: 12, fontSize: "var(--t-xs)", color: "var(--neg)", fontWeight: 500 }}>
+        <p className="mt-3 text-[11px] font-medium text-[color:var(--neg)]">
           ✗ 저장에 실패했습니다. 다시 시도해주세요.
         </p>
       )}
@@ -204,13 +191,5 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
   );
 }
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "6px 10px",
-  border: "1px solid var(--line)",
-  borderRadius: "var(--r-2)",
-  fontSize: "var(--t-sm)",
-  color: "var(--fg)",
-  background: "var(--bg)",
-  boxSizing: "border-box",
-};
+const inputClass =
+  "w-full px-2.5 py-1.5 border border-[color:var(--line)] rounded-[var(--r-2)] text-[12px] text-[color:var(--fg)] bg-[color:var(--bg)] box-border";
