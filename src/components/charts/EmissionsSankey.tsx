@@ -154,7 +154,7 @@ function renderTotalLabel(node: LayoutNode): React.ReactElement {
         dominantBaseline="middle"
         fontFamily="var(--font-mono)"
       >
-        {value.toFixed(1)} t
+        {value.toFixed(1)}
       </text>
       <text x={x1 + 12} y={midY + 16} fontSize={10} fill="var(--fg-4)" dominantBaseline="middle">
         tCO₂e
