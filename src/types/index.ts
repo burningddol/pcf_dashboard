@@ -26,6 +26,7 @@ export interface Activity {
   amount: number;
   unit: string;
   factorId: string;
+  factorValue: number;
   tCO2e: number;
   scope: Scope;
   createdAt: string;

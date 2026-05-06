@@ -12,6 +12,7 @@ const ACTIVITIES: Activity[] = [
     amount: 1000,
     unit: "kWh",
     factorId: "f1",
+    factorValue: 0.456,
     tCO2e: 0.46,
     scope: "scope2",
     createdAt: "2025-01-01T00:00:00.000Z",
@@ -25,6 +26,7 @@ const ACTIVITIES: Activity[] = [
     amount: 500,
     unit: "ton-km",
     factorId: "f2",
+    factorValue: 3.5,
     tCO2e: 1.75,
     scope: "scope3",
     createdAt: "2025-01-01T00:00:00.000Z",
@@ -38,6 +40,7 @@ const ACTIVITIES: Activity[] = [
     amount: 2000,
     unit: "kWh",
     factorId: "f1",
+    factorValue: 0.456,
     tCO2e: 0.91,
     scope: "scope2",
     createdAt: "2025-02-01T00:00:00.000Z",
@@ -99,7 +102,9 @@ describe("aggregateForSankey", () => {
     const result = aggregateForSankey(ACTIVITIES);
     expect(result.links.find((l) => l.source === "한국전력" && l.target === "전기")).toBeDefined();
     expect(result.links.find((l) => l.source === "전기" && l.target === "scope2")).toBeDefined();
-    expect(result.links.find((l) => l.source === "scope2" && l.target === "total")?.value).toBeCloseTo(0.46 + 0.91);
+    expect(
+      result.links.find((l) => l.source === "scope2" && l.target === "total")?.value
+    ).toBeCloseTo(0.46 + 0.91);
   });
 
   it("빈 배열이면 빈 노드/링크를 반환한다", () => {
