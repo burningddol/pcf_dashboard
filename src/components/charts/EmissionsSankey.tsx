@@ -165,11 +165,16 @@ function renderTotalLabel(node: LayoutNode): React.ReactElement {
 
 function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | null {
   switch (node.kind) {
-    case "category": return renderCategoryLabel(node);
-    case "activity": return renderActivityLabel(node);
-    case "scope": return renderScopeLabel(node, total);
-    case "total": return renderTotalLabel(node);
-    default: return null;
+    case "category":
+      return renderCategoryLabel(node);
+    case "activity":
+      return renderActivityLabel(node);
+    case "scope":
+      return renderScopeLabel(node, total);
+    case "total":
+      return renderTotalLabel(node);
+    default:
+      return null;
   }
 }
 
