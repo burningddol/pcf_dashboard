@@ -83,7 +83,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
               setValue("activityType", e.target.value as ActivityType);
               setValue("factorId", "");
             }}
-            className={inputClass}
+            className={cn(inputClass, "cursor-pointer")}
           >
             {ACTIVITY_TYPES.map((t) => (
               <option key={t} value={t}>
@@ -97,7 +97,11 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
           <span className="micro">배출계수</span>
           <select
             {...register("factorId")}
-            className={cn(inputClass, errors.factorId && "border-[color:var(--neg)]")}
+            className={cn(
+              inputClass,
+              "cursor-pointer",
+              errors.factorId && "border-[color:var(--neg)]"
+            )}
           >
             <option value="">선택</option>
             {filteredFactors.map((f) => (

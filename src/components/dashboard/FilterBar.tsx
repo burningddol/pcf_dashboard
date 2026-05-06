@@ -13,7 +13,7 @@ export default function FilterBar() {
         value={filter.from}
         max={filter.to}
         onChange={(e) => setFilter({ ...filter, from: e.target.value })}
-        className="input"
+        className="input cursor-pointer"
       />
       <span className="muted text-[length:var(--t-xs)]">~</span>
       <input
@@ -21,7 +21,7 @@ export default function FilterBar() {
         value={filter.to}
         min={filter.from}
         onChange={(e) => setFilter({ ...filter, to: e.target.value })}
-        className="input"
+        className="input cursor-pointer"
       />
     </div>
   );
