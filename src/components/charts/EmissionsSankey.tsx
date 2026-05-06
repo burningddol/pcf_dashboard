@@ -14,6 +14,8 @@ const NODE_PAD = 14;
 const LEFT_MARGIN = 130;
 const RIGHT_MARGIN = 110;
 
+const pathGen = sankeyLinkHorizontal<SankeyNodeDatum, SankeyLinkDatum>();
+
 type LayoutNode = SankeyNode<SankeyNodeDatum, SankeyLinkDatum>;
 type LayoutLink = SankeyLink<SankeyNodeDatum, SankeyLinkDatum>;
 
@@ -24,120 +26,153 @@ function resolveNodeColor(node: LayoutNode): string {
   return "var(--fg-2)";
 }
 
-function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | null {
+function resolveActivityLabelSize(height: number): number {
+  if (height >= 28) return 10;
+  if (height >= 18) return 9;
+  if (height >= 12) return 8;
+  return 7;
+}
+
+function renderCategoryLabel(node: LayoutNode): React.ReactElement | null {
   const x0 = node.x0 ?? 0;
   const x1 = node.x1 ?? 0;
   const y0 = node.y0 ?? 0;
   const y1 = node.y1 ?? 0;
-  const midY = (y0 + y1) / 2;
   const height = y1 - y0;
+  if (height <= 12) return null;
+  const midX = (x0 + x1) / 2;
+  const midY = (y0 + y1) / 2;
+  return (
+    <text
+      x={midX}
+      y={midY}
+      textAnchor="middle"
+      fontSize={10}
+      fill="black"
+      dominantBaseline="middle"
+      fontWeight={500}
+    >
+      {node.label}
+    </text>
+  );
+}
 
+function renderActivityLabel(node: LayoutNode): React.ReactElement {
+  const x0 = node.x0 ?? 0;
+  const y0 = node.y0 ?? 0;
+  const y1 = node.y1 ?? 0;
+  const height = y1 - y0;
+  const midY = (y0 + y1) / 2;
+  const value = node.value ?? 0;
+  const fontSize = resolveActivityLabelSize(height);
+  const lineOffset = fontSize * 0.7;
+  return (
+    <>
+      <text
+        x={x0 - 8}
+        y={midY - lineOffset}
+        textAnchor="end"
+        fontSize={fontSize}
+        fill="var(--fg-2)"
+        dominantBaseline="middle"
+      >
+        {node.label}
+      </text>
+      <text
+        x={x0 - 8}
+        y={midY + lineOffset}
+        textAnchor="end"
+        fontSize={fontSize}
+        fill="var(--fg-4)"
+        dominantBaseline="middle"
+        fontFamily="var(--font-mono)"
+      >
+        {value.toFixed(2)} t
+      </text>
+    </>
+  );
+}
+
+function renderScopeLabel(node: LayoutNode, total: number): React.ReactElement | null {
+  const x0 = node.x0 ?? 0;
+  const x1 = node.x1 ?? 0;
+  const y0 = node.y0 ?? 0;
+  const y1 = node.y1 ?? 0;
+  const height = y1 - y0;
+  if (height <= 12) return null;
+  const midX = (x0 + x1) / 2;
+  const midY = (y0 + y1) / 2;
+  const value = node.value ?? 0;
+  const showPercent = height > 24;
+  return (
+    <>
+      <text
+        x={midX}
+        y={showPercent ? midY - 7 : midY}
+        textAnchor="middle"
+        fontSize={10}
+        fontWeight={600}
+        fill="black"
+        dominantBaseline="middle"
+      >
+        {node.label}
+      </text>
+      {showPercent && (
+        <text
+          x={midX}
+          y={midY + 7}
+          textAnchor="middle"
+          fontSize={9}
+          fill="rgba(0,0,0,0.6)"
+          dominantBaseline="middle"
+          fontFamily="var(--font-mono)"
+        >
+          {total > 0 ? ((value / total) * 100).toFixed(0) : 0}%
+        </text>
+      )}
+    </>
+  );
+}
+
+function renderTotalLabel(node: LayoutNode): React.ReactElement {
+  const x1 = node.x1 ?? 0;
+  const y0 = node.y0 ?? 0;
+  const y1 = node.y1 ?? 0;
+  const midY = (y0 + y1) / 2;
+  const value = node.value ?? 0;
+  return (
+    <>
+      <text x={x1 + 12} y={midY - 16} fontSize={10} fill="var(--fg-3)" dominantBaseline="middle">
+        Total PCF
+      </text>
+      <text
+        x={x1 + 12}
+        y={midY}
+        fontSize={22}
+        fontWeight={700}
+        fill="var(--fg)"
+        dominantBaseline="middle"
+        fontFamily="var(--font-mono)"
+      >
+        {value.toFixed(1)} t
+      </text>
+      <text x={x1 + 12} y={midY + 16} fontSize={10} fill="var(--fg-4)" dominantBaseline="middle">
+        tCO₂e
+      </text>
+    </>
+  );
+}
+
+function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | null {
   switch (node.kind) {
     case "category":
-      if (height <= 12) return null;
-      return (
-        <text
-          x={(x0 + x1) / 2}
-          y={midY}
-          textAnchor="middle"
-          fontSize={10}
-          fill="black"
-          dominantBaseline="middle"
-          fontWeight={500}
-        >
-          {node.label}
-        </text>
-      );
+      return renderCategoryLabel(node);
     case "activity":
-      return (
-        <>
-          <text
-            x={x0 - 8}
-            y={midY - 6}
-            textAnchor="end"
-            fontSize={10}
-            fill="var(--fg-2)"
-            dominantBaseline="middle"
-          >
-            {node.label}
-          </text>
-          <text
-            x={x0 - 8}
-            y={midY + 7}
-            textAnchor="end"
-            fontSize={10}
-            fill="var(--fg-4)"
-            dominantBaseline="middle"
-            fontFamily="var(--font-mono)"
-          >
-            {(node.value ?? 0).toFixed(2)} t
-          </text>
-        </>
-      );
+      return renderActivityLabel(node);
     case "scope":
-      if (height <= 12) return null;
-      return (
-        <>
-          <text
-            x={(x0 + x1) / 2}
-            y={height > 24 ? midY - 7 : midY}
-            textAnchor="middle"
-            fontSize={10}
-            fontWeight={600}
-            fill="black"
-            dominantBaseline="middle"
-          >
-            {node.label}
-          </text>
-          {height > 24 && (
-            <text
-              x={(x0 + x1) / 2}
-              y={midY + 7}
-              textAnchor="middle"
-              fontSize={9}
-              fill="rgba(0,0,0,0.6)"
-              dominantBaseline="middle"
-              fontFamily="var(--font-mono)"
-            >
-              {total > 0 ? (((node.value ?? 0) / total) * 100).toFixed(0) : 0}%
-            </text>
-          )}
-        </>
-      );
+      return renderScopeLabel(node, total);
     case "total":
-      return (
-        <>
-          <text
-            x={x1 + 12}
-            y={midY - 16}
-            fontSize={10}
-            fill="var(--fg-3)"
-            dominantBaseline="middle"
-          >
-            Total PCF
-          </text>
-          <text
-            x={x1 + 12}
-            y={midY}
-            fontSize={22}
-            fontWeight={700}
-            fill="var(--fg)"
-            dominantBaseline="middle"
-            fontFamily="var(--font-mono)"
-          >
-            {(node.value ?? 0).toFixed(1)} t
-          </text>
-          <text
-            x={x1 + 12}
-            y={midY + 16}
-            fontSize={10}
-            fill="var(--fg-4)"
-            dominantBaseline="middle"
-          >
-            tCO₂e
-          </text>
-        </>
-      );
+      return renderTotalLabel(node);
     default:
       return null;
   }
@@ -166,6 +201,11 @@ export default function EmissionsSankey({ data }: EmissionsSankeyProps): React.R
     });
   }, [data]);
 
+  const colorByNodeId = useMemo(() => {
+    if (!graph) return new Map<string, string>();
+    return new Map(graph.nodes.map((n) => [n.id, resolveNodeColor(n)]));
+  }, [graph]);
+
   if (!graph || graph.nodes.length === 0) {
     return (
       <div className="flex items-center justify-center h-[300px]">
@@ -174,7 +214,6 @@ export default function EmissionsSankey({ data }: EmissionsSankeyProps): React.R
     );
   }
 
-  const pathGen = sankeyLinkHorizontal<SankeyNodeDatum, SankeyLinkDatum>();
   const { total } = data;
 
   return (
@@ -184,14 +223,15 @@ export default function EmissionsSankey({ data }: EmissionsSankeyProps): React.R
       role="img"
       aria-label="PCF Sankey 차트"
     >
-      {graph.links.map((link: LayoutLink, i: number) => {
-        const color = resolveNodeColor(link.source as LayoutNode);
+      {graph.links.map((link: LayoutLink) => {
+        const sourceId = (link.source as LayoutNode).id;
+        const targetId = (link.target as LayoutNode).id;
         return (
           <path
-            key={i}
+            key={`${sourceId}-${targetId}`}
             d={pathGen(link) ?? ""}
             fill="none"
-            stroke={color}
+            stroke={colorByNodeId.get(sourceId) ?? "var(--fg-3)"}
             strokeOpacity={0.25}
             strokeWidth={Math.max(1, link.width ?? 0)}
           />
@@ -205,10 +245,10 @@ export default function EmissionsSankey({ data }: EmissionsSankeyProps): React.R
             y={node.y0 ?? 0}
             width={(node.x1 ?? 0) - (node.x0 ?? 0)}
             height={(node.y1 ?? 0) - (node.y0 ?? 0)}
-            fill={resolveNodeColor(node)}
+            fill={colorByNodeId.get(node.id) ?? "var(--fg-3)"}
             rx={2}
           />
-          <g>{renderNodeLabel(node, total)}</g>
+          {renderNodeLabel(node, total)}
         </g>
       ))}
     </svg>
