@@ -11,7 +11,7 @@
 | Overview 대시보드 (KPI, Stacked Bar, Sankey) | `docs/screenshots/overview.png`      |
 | 활동 데이터 입력 + 에러 메시지               | `docs/screenshots/activity-form.png` |
 | Excel 일괄 임포트 (실패 건 재시도)           | `docs/screenshots/excel-import.png`  |
-| 전체 사용 흐름 영상                          | `docs/screenshots/demo.mp4`          |
+| 전체 사용 흐름 영상                          | `docs/시연영상pcf.mp4`               |
 
 ---
 
