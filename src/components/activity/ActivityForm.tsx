@@ -2,24 +2,18 @@
 
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/cn";
 import { postJson } from "@/lib/fetcher";
 import { computeTCO2e } from "@/lib/domain/pcf";
 import { mapToScope } from "@/lib/domain/scope";
 import { COMPANY_ID, ACTIVITY_TYPES } from "@/lib/domain/constants";
+import { ActivityFormSchema, type ActivityFormValues } from "@/lib/domain/schemas";
 import type { Activity, ActivityType, CreateActivityBody, EmissionFactor } from "@/types";
 
 interface ActivityFormProps {
   factors: EmissionFactor[];
-}
-
-interface FormValues {
-  activityType: ActivityType;
-  factorId: string;
-  description: string;
-  yearMonth: string;
-  amount: string;
 }
 
 function FieldError({ message }: { message?: string }) {
@@ -36,13 +30,13 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
     reset,
     setValue,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<ActivityFormValues>({
+    resolver: zodResolver(ActivityFormSchema),
     defaultValues: {
       activityType: "전기",
       factorId: "",
       description: "",
       yearMonth: "",
-      amount: "",
     },
   });
 
@@ -55,26 +49,21 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
 
   const selectedFactor = filteredFactors.find((f) => f.id === factorId);
   const amountUnit = selectedFactor?.unit.split("/")[1] ?? "";
-  const preview =
-    selectedFactor && amount ? computeTCO2e(parseFloat(amount), selectedFactor.value) : null;
+  const preview = selectedFactor && amount ? computeTCO2e(amount, selectedFactor.value) : null;
 
   const mutation = useMutation({
     mutationFn: (body: CreateActivityBody) => postJson<Activity>("/api/activities", body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["activities"] });
-      reset({ activityType, factorId: "", description: "", yearMonth: "", amount: "" });
+      reset({ activityType, factorId: "", description: "", yearMonth: "" });
     },
   });
 
-  function onSubmit(values: FormValues): void {
+  function onSubmit(values: ActivityFormValues): void {
     mutation.mutate({
+      ...values,
       companyId: COMPANY_ID,
-      activityType: values.activityType,
-      description: values.description,
-      yearMonth: values.yearMonth,
-      amount: parseFloat(values.amount),
       unit: amountUnit,
-      factorId: values.factorId,
       scope: mapToScope(values.activityType),
     });
   }
@@ -107,7 +96,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
         <label className="flex flex-col gap-1.5">
           <span className="micro">배출계수</span>
           <select
-            {...register("factorId", { required: "배출계수를 선택해주세요." })}
+            {...register("factorId")}
             className={cn(inputClass, errors.factorId && "border-[color:var(--neg)]")}
           >
             <option value="">선택</option>
@@ -123,7 +112,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
         <label className="flex flex-col gap-1.5">
           <span className="micro">설명</span>
           <input
-            {...register("description", { required: "설명을 입력해주세요." })}
+            {...register("description")}
             type="text"
             placeholder="예: 플라스틱 1"
             className={cn(inputClass, errors.description && "border-[color:var(--neg)]")}
@@ -134,10 +123,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
         <label className="flex flex-col gap-1.5">
           <span className="micro">기간</span>
           <input
-            {...register("yearMonth", {
-              required: "기간을 입력해주세요.",
-              pattern: { value: /^\d{4}-\d{2}$/, message: "YYYY-MM 형식으로 입력해주세요." },
-            })}
+            {...register("yearMonth")}
             type="text"
             placeholder="YYYY-MM"
             className={cn(inputClass, errors.yearMonth && "border-[color:var(--neg)]")}
@@ -148,7 +134,7 @@ export default function ActivityForm({ factors }: ActivityFormProps) {
         <label className="flex flex-col gap-1.5">
           <span className="micro">활동량{amountUnit && ` (${amountUnit})`}</span>
           <input
-            {...register("amount", { required: "활동량을 입력해주세요.", min: 0 })}
+            {...register("amount", { valueAsNumber: true })}
             type="number"
             placeholder="0"
             step="any"

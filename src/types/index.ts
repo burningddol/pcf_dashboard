@@ -37,13 +37,4 @@ export interface FilterState {
   to: string;
 }
 
-export interface CreateActivityBody {
-  companyId: string;
-  activityType: ActivityType;
-  description: string;
-  yearMonth: string;
-  amount: number;
-  unit: string;
-  factorId: string;
-  scope: Scope;
-}
+export type { CreateActivityBody } from "@/lib/domain/schemas";
