@@ -25,6 +25,7 @@ function toActivity(row: {
   amount: number;
   unit: string;
   factorId: string;
+  factorValue: number;
   tCO2e: number;
   scope: string;
   createdAt: Date;
@@ -75,6 +76,7 @@ export async function createActivity(body: CreateActivityBody): Promise<Activity
       amount: body.amount,
       unit: body.unit,
       factorId: body.factorId,
+      factorValue: factor.value,
       scope: body.scope,
       tCO2e: computeTCO2e(body.amount, factor.value),
     },

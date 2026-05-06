@@ -30,6 +30,7 @@ model Activity {
   companyId    String
   factor       EmissionFactor @relation(fields: [factorId], references: [id])
   factorId     String
+  factorValue  Float
   activityType String
   description  String
   yearMonth    String
