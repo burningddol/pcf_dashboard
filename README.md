@@ -27,7 +27,8 @@ cd pcf_dashboard/app
 # 2. 의존성 설치
 yarn install
 
-# 3. PostgreSQL 시작 + 시드
+# 3. 환경변수 설정 + PostgreSQL 시작 + 시드
+cp .env.example .env
 docker compose up -d
 yarn db:migrate && yarn db:seed
 
@@ -40,7 +41,7 @@ yarn start
 
 브라우저에서 http://localhost:3000 접속
 
-> `.env` 기본값: `DATABASE_URL="postgresql://pcf:pcf@localhost:5432/pcf"` — Docker Compose가 동일 설정으로 DB를 띄우므로 수정 불필요
+> `.env.example`에 들어 있는 `DATABASE_URL="postgresql://pcf:pcf@localhost:5432/pcf"` 값을 그대로 사용합니다. Docker Compose가 동일 설정으로 DB를 띄우므로 별도 수정 불필요. Windows PowerShell이라면 `cp` 대신 `copy .env.example .env`.
 
 ---
 
