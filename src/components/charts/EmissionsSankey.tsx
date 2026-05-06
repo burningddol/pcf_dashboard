@@ -49,11 +49,11 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
         </text>
       );
     case "activity": {
-      if (height < 12) return null;
       let labelFontSize: number;
       if (height >= 28) labelFontSize = 10;
       else if (height >= 18) labelFontSize = 9;
-      else labelFontSize = 8;
+      else if (height >= 12) labelFontSize = 8;
+      else labelFontSize = 7;
       const lineOffset = labelFontSize * 0.7;
       return (
         <>
