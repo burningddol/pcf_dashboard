@@ -1,7 +1,8 @@
 import type { ActivityType, Scope } from "@/types";
 
 export const COMPANY_ID = "ct-045";
-export const ACTIVITY_TYPES: ActivityType[] = ["전기", "원소재", "운송"];
+export const ACTIVITY_TYPES = ["전기", "원소재", "운송"] as const satisfies readonly ActivityType[];
+export const SCOPES = ["scope1", "scope2", "scope3"] as const satisfies readonly Scope[];
 
 export type LifecycleStage = "원료" | "제조" | "유통";
 

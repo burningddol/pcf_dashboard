@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getActivities, createActivity, SimulatedWriteError, InvalidFactorError } from "@/lib/api";
-import type { CreateActivityBody } from "@/lib/api";
+import { CreateActivityBodySchema } from "@/lib/domain/schemas";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const { searchParams } = req.nextUrl;
@@ -12,10 +13,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const body: CreateActivityBody = await req.json();
+  const parsed = CreateActivityBodySchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", issues: z.treeifyError(parsed.error) },
+      { status: 400 }
+    );
+  }
 
   try {
-    const activity = await createActivity(body);
+    const activity = await createActivity(parsed.data);
     return NextResponse.json(activity, { status: 201 });
   } catch (err) {
     if (err instanceof SimulatedWriteError) {

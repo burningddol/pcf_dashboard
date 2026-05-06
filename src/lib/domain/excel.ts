@@ -1,9 +1,8 @@
 import { read, utils } from "xlsx";
 import { mapToScope } from "@/lib/domain/scope";
-import { COMPANY_ID, ACTIVITY_TYPES } from "@/lib/domain/constants";
+import { COMPANY_ID } from "@/lib/domain/constants";
+import { CreateActivityBodySchema } from "@/lib/domain/schemas";
 import type { ActivityType, CreateActivityBody } from "@/types";
-
-const ACTIVITY_TYPE_SET = new Set<string>(ACTIVITY_TYPES);
 
 const FACTOR_ID: Record<string, string> = {
   전기: "ef-electricity-v1",
@@ -18,7 +17,7 @@ function inferFactorId(activityType: string, description: string): string {
     if (description.includes("2")) return FACTOR_ID["원소재-2"];
     if (description.includes("1")) return FACTOR_ID["원소재-1"];
   }
-  return FACTOR_ID[activityType]!;
+  return FACTOR_ID[activityType] ?? "";
 }
 
 export function parseExcel(file: File): Promise<CreateActivityBody[]> {
@@ -41,19 +40,20 @@ export function parseExcel(file: File): Promise<CreateActivityBody[]> {
             number,
             string,
           ];
+          if (!date) continue;
 
-          if (!date || !ACTIVITY_TYPE_SET.has(activityType) || !amount) continue;
-
-          bodies.push({
+          const candidate = {
             companyId: COMPANY_ID,
-            activityType: activityType as ActivityType,
+            activityType,
             description,
             yearMonth: String(date).slice(0, 7),
             amount: Number(amount),
             unit,
             factorId: inferFactorId(activityType, description),
             scope: mapToScope(activityType as ActivityType),
-          });
+          };
+          const parsed = CreateActivityBodySchema.safeParse(candidate);
+          if (parsed.success) bodies.push(parsed.data);
         }
 
         resolve(bodies);
