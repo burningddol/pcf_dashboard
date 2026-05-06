@@ -4,14 +4,41 @@
 
 ---
 
-## 시연
+## 시연(데모)
 
-| 화면                                         | 미디어                               |
-| -------------------------------------------- | ------------------------------------ |
-| Overview 대시보드 (KPI, Stacked Bar, Sankey) | `docs/screenshots/overview.png`      |
-| 활동 데이터 입력 + 에러 메시지               | `docs/screenshots/activity-form.png` |
-| Excel 일괄 임포트 (실패 건 재시도)           | `docs/screenshots/excel-import.png`  |
-| 전체 사용 흐름 영상                          | `docs/시연영상pcf.mp4`               |
+
+https://github.com/user-attachments/assets/a95182a0-5fc7-4a86-b683-73df6dbfbaf9
+
+---
+
+## 시연(사진자료)
+<img width="1899" height="951" alt="image" src="https://github.com/user-attachments/assets/ceb3a387-86d9-451c-b4da-85d452e37da3" />
+
+첫 페이지 진입 시 Sankey 차트를 통해 종류 별, 카테고리 별, scope 별 흐름에 따른 **pcf 계산 흐름을** 한눈에 확인 가능합니다.
+
+<img width="1904" height="947" alt="image" src="https://github.com/user-attachments/assets/8380c6d7-6e0a-4b70-af59-427936be93ce" />
+
+차트 종류를 월별 배출량으로 변경 시 stacked bar 차트로 **scope단위 월별 배출량을** 한눈에 확인 가능합니다.
+
+<img width="1894" height="946" alt="image" src="https://github.com/user-attachments/assets/b23cf9fe-5145-40cf-bf4c-49fc1fe11c6c" />
+
+활동 데이터 탭에선 각 활동별 리스트와 활동 추가 폼을 사용 할 수 있습니다.
+
+<img width="1658" height="268" alt="image" src="https://github.com/user-attachments/assets/2233b282-d1e7-43da-ab55-d11bcffb78ae" />
+
+**버전 별 계수를 구분하고** 계수를 선택 할 수 있습니다.
+
+<img width="1651" height="265" alt="image" src="https://github.com/user-attachments/assets/0fa9f1f4-9ecf-4315-8d80-648b0626e02a" />
+
+**ZOD를 통한 입력값 검증으로** 잘못 된 값을 표시합니다.
+
+<img width="1639" height="264" alt="image" src="https://github.com/user-attachments/assets/6663c204-7117-4c5b-8ffb-eb9d127b5175" />
+
+리퀘스트 실패(15%확률)시 에러메세지를 표시합니다.
+
+<img width="1700" height="348" alt="image" src="https://github.com/user-attachments/assets/af03ce9b-ca23-4e61-ab03-7f49d2f9a088" />
+
+**엑셀 자료로 DB에 활동데이터를 등록**하고, 각 행마다 실패(15%확률)한 건에 대하여 다시 시도를 할 수 있습니다.
 
 ---
 
@@ -47,13 +74,11 @@ yarn start
 
 ## 도메인 모델
 
-### 핵심 공식
+### 핵심 공식 (단일 제품 회사 가정)
 
 ```
 tCO₂e = 활동량(amount) × 배출계수(factor.value) ÷ 1000
 ```
-
-배출계수는 KEPCO·KEITI 등 정부 고시 값을 사용하며, 매년 개정될 때마다 새 버전으로 등록됩니다.
 
 ### GHG Scope 분류
 
@@ -67,42 +92,6 @@ tCO₂e = 활동량(amount) × 배출계수(factor.value) ÷ 1000
 
 ---
 
-## 주요 기능
-
-### Overview (`/`) — 경영자/실무자 공용 대시보드
-
-| 컴포넌트             | 역할                                                          |
-| -------------------- | ------------------------------------------------------------- |
-| **KPI 카드**         | 총 tCO₂e, Scope별 비중(%), 활동 건수 — 단위(t)와 비율(%) 명시 |
-| **월별 Stacked Bar** | "언제 많이 배출했는가" — 월별 × Scope 누적                    |
-| **Sankey Diagram**   | "어디서 배출이 오는가" — 활동 → 활동유형 → Scope → Total 흐름 |
-| **기간 필터**        | from/to 월 선택 시 모든 차트·KPI 즉시 동기 갱신               |
-
-### 활동 데이터 (`/activities`) — 실무자 입력
-
-| 컴포넌트                  | 역할                                                          |
-| ------------------------- | ------------------------------------------------------------- |
-| **활동 테이블**           | 등록된 배출 활동 목록, tCO₂e와 Scope 뱃지                     |
-| **활동 추가 폼**          | 유형·배출계수·설명·기간·활동량 입력, 입력 즉시 tCO₂e 미리보기 |
-| **Excel 임포트** (보너스) | 과제용 `.xlsx`를 그대로 업로드 → 일괄 등록                    |
-
-### 입력 검증 — 단일 스키마로 클라이언트·서버·Excel 임포트 모두 커버
-
-`src/lib/domain/schemas.ts`의 Zod 스키마를 세 곳에서 공유합니다.
-
-- **활동 추가 폼**: `zodResolver(ActivityFormSchema)`로 즉시 인라인 에러
-- **API Route POST**: `CreateActivityBodySchema.safeParse()`로 서버 검증, 실패 시 400 + 에러 트리 반환
-- **Excel 임포트 파싱**: 행마다 `safeParse`로 통과한 행만 등록 — 잘못된 데이터가 API까지 가지 않음
-
-타입도 `z.infer`로 자동 추론되어 `CreateActivityBody` 타입 정의가 스키마와 항상 일치합니다.
-
-### 단위 표기
-
-- **활동량**: 배출계수의 분모 단위(`kWh`, `kg`, `km` 등)를 라벨에 자동 노출 (예: `활동량 (kWh)`)
-- **결과**: tCO₂e는 소수점 셋째 자리까지 + 단위 `t` 명시
-- **배출계수 표시**: `ef-electricity-v1 · 0.456 kgCO2e/kWh` — 값과 단위 함께
-
----
 
 ## 시스템 설계
 
@@ -245,7 +234,7 @@ amount * 현재계수         amount * 입력시점계수 = tCO2e (저장)
 NEXT_PUBLIC_SIMULATE_FAILURE_RATE=0 yarn dev
 ```
 
-Excel 임포트의 부분 성공·재시도 동작을 직접 확인하려면 기본값(`0.15`) 그대로 두고 임포트하면 됩니다.
+환경 변수입력이 없을 시 기본값 0.15로 재현되어 있습니다.
 
 ---
 
@@ -256,13 +245,13 @@ yarn test           # 단위 테스트 실행
 yarn test:coverage  # 커버리지 리포트 (src/lib/domain/ 100%)
 ```
 
-도메인 함수(`pcf`, `scope`, `aggregate`, `excel`)만 단위 테스트하고, API Route·UI는 수동 QA합니다. 핵심 비즈니스 로직에 집중해 테스트 작성 비용 대비 효과를 높이는 전략입니다.
+도메인 함수(`pcf`, `scope`, `aggregate`, `excel`)만 단위 테스트하고, API Route·UI는 수동 QA합니다.
 
 ---
 
 ## AI 사용 내역
 
-`docs/AI_USAGE.md` 참고 — 사용한 도구·프롬프트·검토 방식·생성된 코드를 직접 이해하고 수정한 부분을 기록.
+(`docs/AI_USAGE.md`)[https://github.com/burningddol/pcf_dashboard/blob/main/docs/AI_USAGE.md} 참고 — 사용한 도구·프롬프트·검토 방식·생성된 코드를 직접 이해하고 수정한 부분을 기록.
 
 ---
 
