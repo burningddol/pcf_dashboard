@@ -112,7 +112,9 @@ export default function OverviewPage() {
                   월별 배출량
                 </TabButton>
               </div>
-              <span className="muted text-[length:var(--t-xs)]">단위: tCO₂e</span>
+              <span className="muted text-[length:var(--t-xs)]">
+                단위: tCO₂e · 단일 제품 회사 가정
+              </span>
             </div>
             <div className="card-b">
               {chartTab === "sankey" ? (
