@@ -253,7 +253,7 @@ yarn test:coverage  # 커버리지 리포트 (src/lib/domain/ 100%)
 
 ## AI 사용 내역
 
-[`docs/AI_USAGE.md`](https://github.com/burningddol/pcf_dashboard/blob/main/docs/AI_USAGE.md) 참고 — 사용한 도구·프롬프트·검토 방식·생성된 코드를 직접 이해하고 수정한 부분을 기록.
+[`docs/AI_USAGE.md`](https://github.com/burningddol/pcf_dashboard/blob/main/docs/AI_USAGE.md) 참고 — 사용한 도구·검토 방식·결정 내역 기록.
 
 ---
 
