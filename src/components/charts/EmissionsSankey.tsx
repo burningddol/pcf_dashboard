@@ -48,14 +48,20 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
           {node.label}
         </text>
       );
-    case "activity":
+    case "activity": {
+      if (height < 12) return null;
+      let labelFontSize: number;
+      if (height >= 28) labelFontSize = 10;
+      else if (height >= 18) labelFontSize = 9;
+      else labelFontSize = 8;
+      const lineOffset = labelFontSize * 0.7;
       return (
         <>
           <text
             x={x0 - 8}
-            y={midY - 6}
+            y={midY - lineOffset}
             textAnchor="end"
-            fontSize={10}
+            fontSize={labelFontSize}
             fill="var(--fg-2)"
             dominantBaseline="middle"
           >
@@ -63,9 +69,9 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
           </text>
           <text
             x={x0 - 8}
-            y={midY + 7}
+            y={midY + lineOffset}
             textAnchor="end"
-            fontSize={10}
+            fontSize={labelFontSize}
             fill="var(--fg-4)"
             dominantBaseline="middle"
             fontFamily="var(--font-mono)"
@@ -74,6 +80,7 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
           </text>
         </>
       );
+    }
     case "scope":
       if (height <= 12) return null;
       return (
