@@ -40,7 +40,7 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
           x={(x0 + x1) / 2}
           y={midY}
           textAnchor="middle"
-          fontSize={9}
+          fontSize={10}
           fill="black"
           dominantBaseline="middle"
           fontWeight={500}
@@ -55,7 +55,7 @@ function renderNodeLabel(node: LayoutNode, total: number): React.ReactElement | 
             x={x0 - 8}
             y={midY - 6}
             textAnchor="end"
-            fontSize={11}
+            fontSize={10}
             fill="var(--fg-2)"
             dominantBaseline="middle"
           >
